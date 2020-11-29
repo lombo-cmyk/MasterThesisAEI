@@ -1,6 +1,22 @@
 # MasterThesisAEI
 
-## This is a placeholder for some description of idea and plan
+## Description
+Built device should be able measure various parameters, while also being
+ portable and preferably battery powered. Parameters needed to be measured are:
+ * Dust content in the air:
+     * PM 2.5,
+     * PM 10,
+ * Carbon dioxide,
+ * Moisture content,
+ * Carbon monoxide - optional,
+ * Air temperature
+ 
+Results should be communicated to a different system using e.g. Modbus RTU 
+or Modbus via ethernet. Measured values should also be provided to the user 
+with 0-10V analog outputs and LCD display.
+
+ The work includes testing of sensors in the laboratory, implementation of the 
+ electronic system, programming of the selected microcontroller.
 
 
 ## Potential sensors to use
