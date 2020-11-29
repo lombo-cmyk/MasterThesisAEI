@@ -1,6 +1,7 @@
 # MasterThesisAEI
 
 ## Description
+### Summary
 Built device should be able measure various parameters, while also being
  portable and preferably battery powered. Parameters needed to be measured are:
  * Dust content in the air:
@@ -15,9 +16,23 @@ Results should be communicated to a different system using e.g. Modbus RTU
 or Modbus via ethernet. Measured values should also be provided to the user 
 with 0-10V analog outputs and LCD display.
 
- The work includes testing of sensors in the laboratory, implementation of the 
- electronic system, programming of the selected microcontroller.
+The work includes testing of sensors in the laboratory, implementation of the 
+electronic system, programming of the selected microcontroller.
+ 
+### Devices
+Everything will run on ESP32 Devkit v1. The board is capable of
+communication through Wi-Fi, UART, I2C and SPI. It can ran on 3v3 or 5V. Has
+about 30 GPIO pins, each with several usage possibilities. [Link](https://docs.zerynth.com/latest/reference/boards/doit_esp32/docs/)
+  
+There will also be a standard 16x2 LCD display provided. It can communicate
+with standard compliant with HD44780 controller or through an
+additional I2C converter. 
 
+### Language
+ESP32 will be programmed using ESP-IDF framework and libraries. ESP-IDF is the 
+official development framework for the ESP32 and ESP32-S Series SoCs. [Link](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/)
+Application code will wrap the legacy c code into a modern C++ used to write 
+all application related code.
 
 ## Potential sensors to use
 It would be nice if sensors could communicate with I2C or would be able to
