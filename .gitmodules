@@ -1,0 +1,6 @@
+[submodule "MasterThesisApp/components/esp32-i2c-lcd1602"]
+	path = MasterThesisApp/components/esp32-i2c-lcd1602
+	url = https://github.com/DavidAntliff/esp32-i2c-lcd1602.git
+[submodule "MasterThesisApp/components/esp32-smbus"]
+	path = MasterThesisApp/components/esp32-smbus
+	url = https://github.com/DavidAntliff/esp32-smbus.git
