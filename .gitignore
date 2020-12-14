@@ -1,7 +1,7 @@
 .idea
 /MasterThesisApp/idea
-//MasterThesisApp/build
-//MasterThesisApp/cmake-build-debug
+/MasterThesisApp/build
+/MasterThesisApp/cmake-build-debug
 LICENSE
 
 
