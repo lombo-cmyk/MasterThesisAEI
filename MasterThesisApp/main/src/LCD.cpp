@@ -125,3 +125,15 @@ void LCD::Setbacklight(const std::uint16_t& displayState) {
     }
 }
 
+void LCD::DisplayCurrentState() {
+    std::uint16_t  currentState = InterruptHandler::GetDisplayState();
+    std::string state = "State no";
+    std::string noState = ConvertNumberToString(currentState, 1);
+    switch (currentState) {
+        case 1:
+            DisplayTwoLines(state, noState);
+            break;
+        default:
+            DisplayTwoLines(state, noState);
+    }
+}

@@ -14,6 +14,7 @@ class LCD {
 public:
     LCD();
     static void AdjustLine(std::string& line);
+    void DisplayCurrentState();
 
 private:
     i2c_config_t connectionConfiguration_ = {};
