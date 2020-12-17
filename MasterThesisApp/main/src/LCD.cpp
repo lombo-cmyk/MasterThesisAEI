@@ -130,10 +130,61 @@ void LCD::DisplayCurrentState() {
     std::string state = "State no";
     std::string noState = ConvertNumberToString(currentState, 1);
     switch (currentState) {
+        case 0:
+            DisplayPMMeasure_25();
+            break;
         case 1:
-            DisplayTwoLines(state, noState);
+            DisplayPMMeasure_10();
+            break;
+        case 2:
+            DisplayCOMeasure();
+            break;
+        case 3:
+            DisplayCO2Measure();
+            break;
+        case 4:
+            DisplayTempMeasure();
+            break;
+        case 5:
+            DisplayHumidityMeasure();
             break;
         default:
             DisplayTwoLines(state, noState);
     }
+}
+
+void LCD::DisplayPMMeasure_25() {
+    std::string firstLine = "PM 2.5";
+    std::string secondLine = "000";
+    DisplayTwoLines(firstLine, secondLine);
+}
+
+void LCD::DisplayPMMeasure_10() {
+    std::string firstLine = "PM 10";
+    std::string secondLine = "000";
+    DisplayTwoLines(firstLine, secondLine);
+}
+
+void LCD::DisplayCOMeasure() {
+    std::string firstLine = "CO";
+    std::string secondLine = "000";
+    DisplayTwoLines(firstLine, secondLine);
+}
+
+void LCD::DisplayCO2Measure() {
+    std::string firstLine = "CO2";
+    std::string secondLine = "000";
+    DisplayTwoLines(firstLine, secondLine);
+}
+
+void LCD::DisplayTempMeasure() {
+    std::string firstLine = "Temperature";
+    std::string secondLine = "000";
+    DisplayTwoLines(firstLine, secondLine);
+}
+
+void LCD::DisplayHumidityMeasure() {
+    std::string firstLine = "Humidity";
+    std::string secondLine = "000";
+    DisplayTwoLines(firstLine, secondLine);
 }

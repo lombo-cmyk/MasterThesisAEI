@@ -27,7 +27,7 @@ private:
     static std::uint16_t displayState_;
     static bool lcdBacklight_;
     static TickType_t lastWakeTimeForwardButton_;
-    static const std::uint16_t maxDisplayStates = 255;
+    static const std::uint16_t maxDisplayStates = 5;
     static void DisplayNextState(void* arg);
 };
 

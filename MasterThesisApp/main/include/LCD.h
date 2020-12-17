@@ -28,6 +28,13 @@ private:
     void DisplayLine(std::string& line, std::uint8_t row) const;
     void DisplayTwoLines(std::string& line_1, std::string& line_2) const;
     void DisplayWelcomeMessage() const;
+    void DisplayPMMeasure_25();
+    void DisplayPMMeasure_10();
+    void DisplayCOMeasure();
+    void DisplayCO2Measure();
+    void DisplayTempMeasure();
+    void DisplayHumidityMeasure();
+
     void Setbacklight(const std::uint16_t& displayState);
     static uint8_t _wait_for_user(void);
 };
