@@ -13,12 +13,13 @@ void app_main();
 }
 
 void app_main(void) {
-    InterruptHandler::Start();
+    auto& intHandler = InterruptHandler::getInstance();
+    intHandler.InitializeInterrupts();
     auto& I2cWrapper = I2CWrapper::getInstance();
     I2cWrapper.ConfigureCommunication();
     LCD Lcd = LCD();
     for (;;) {
-        std::cout << "Display state: " << InterruptHandler::GetDisplayState()
+        std::cout << "Display state: " << intHandler.GetDisplayState()
                   << std::endl;
         Lcd.DisplayCurrentState();
     }

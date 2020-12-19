@@ -4,21 +4,19 @@
 
 #include "include/InterruptHandler.h"
 
-std::uint16_t InterruptHandler::displayState_ = 0;
-bool InterruptHandler::lcdBacklight_ = true;
-TickType_t InterruptHandler::lastWakeTimeForwardButton_ = xTaskGetTickCount();
-
 void InterruptHandler::DisplayNextState(void* arg) {
-    if ((xTaskGetTickCount() - lastWakeTimeForwardButton_) > DEBOUNCE_TIME) {
-        displayState_++;
-        if (displayState_ > maxDisplayStates) {
-            displayState_ = 0;
+    auto& instance = InterruptHandler::getInstance();
+    if ((xTaskGetTickCount() - instance.lastWakeTimeForwardButton_) >
+        DEBOUNCE_TIME) {
+        instance.displayState_++;
+        if (instance.displayState_ > instance.maxDisplayStates) {
+            instance.displayState_ = 0;
         }
-        lastWakeTimeForwardButton_ = xTaskGetTickCount();
+        instance.lastWakeTimeForwardButton_ = xTaskGetTickCount();
     }
 }
 
-void InterruptHandler::Start() {
+void InterruptHandler::InitializeInterrupts() {
     gpio_set_direction(FORWARD_BUTTON, GPIO_MODE_INPUT);
     gpio_set_direction(FORWARD_BUTTON, GPIO_MODE_INPUT);
     gpio_set_direction(BUTTON_2, GPIO_MODE_INPUT);

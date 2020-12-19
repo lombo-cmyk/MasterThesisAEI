@@ -4,9 +4,7 @@
 
 #include "include/LCD.h"
 #include "sdkconfig.h"
-#include "smbus.h"
 #include "include/Definitions.h"
-#include "include/InterruptHandler.h"
 #include "string"
 #include "include/I2CWrapper.h"
 #include <stdexcept>
@@ -96,10 +94,10 @@ uint8_t LCD::_wait_for_user(void) {
 
 void LCD::Setbacklight(const std::uint16_t& displayState) {
     uint64_t tenSeconds = 10000000;
-    if (displayState == 0 && InterruptHandler::GetLcdBacklight()) {
+    if (displayState == 0 && intHandler_.GetLcdBacklight()) {
         i2c_lcd1602_set_backlight(LcdInfo_, true);
         backlightTimer_ = esp_timer_get_time();
-        InterruptHandler::SetBacklightFromLcd() = false;
+        intHandler_.SetBacklightFromLcd() = false;
     }
     esp_timer_get_time();
     if (displayState == 0 &&
@@ -113,7 +111,7 @@ void LCD::Setbacklight(const std::uint16_t& displayState) {
 }
 
 void LCD::DisplayCurrentState() {
-    std::uint16_t currentState = InterruptHandler::GetDisplayState();
+    std::uint16_t currentState = intHandler_.GetDisplayState();
     std::string state = "State no";
     std::string noState = ConvertNumberToString(currentState, 1);
     switch (currentState) {

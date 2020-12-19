@@ -8,6 +8,7 @@
 #include "driver/i2c.h"
 #include "i2c-lcd1602.h"
 #include "Definitions.h"
+#include "InterruptHandler.h"
 #include <string>
 
 class LCD {
@@ -20,6 +21,7 @@ private:
     i2c_lcd1602_info_t* LcdInfo_ = new i2c_lcd1602_info_t;
     bool isBacklight_ = true;
     std::uint64_t backlightTimer_ = esp_timer_get_time();
+    InterruptHandler& intHandler_ = InterruptHandler::getInstance();
 
     template<typename T>
     std::string ConvertNumberToString(T number, std::uint8_t precision) const;

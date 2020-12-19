@@ -6,26 +6,28 @@
 #define AIRCONTROLLER_INTERRUPTHANDLER_H
 
 #include "Definitions.h"
+#include "Singleton.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos//task.h"
 #include <cstdint>
 
-struct InterruptHandler {
+class InterruptHandler final : public Singleton<InterruptHandler> {
 public:
-    static void Start();
-    static std::uint16_t GetDisplayState();
-    static auto SetBacklightFromLcd() -> bool& {
+    friend Singleton<InterruptHandler>;
+    void InitializeInterrupts();
+    std::uint16_t GetDisplayState();
+    auto SetBacklightFromLcd() -> bool& {
         return lcdBacklight_;
     }
-    static auto GetLcdBacklight() -> const bool& {
+    auto GetLcdBacklight() -> const bool& {
         return lcdBacklight_;
     }
 
 private:
-    static std::uint16_t displayState_;
-    static bool lcdBacklight_;
-    static TickType_t lastWakeTimeForwardButton_;
-    static const std::uint16_t maxDisplayStates = 5;
+    std::uint16_t displayState_ = 0;
+    bool lcdBacklight_ = true;
+    TickType_t lastWakeTimeForwardButton_ = xTaskGetTickCount();
+    const std::uint16_t maxDisplayStates = 5;
     static void DisplayNextState(void* arg);
 };
 
