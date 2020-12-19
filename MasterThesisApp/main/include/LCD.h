@@ -17,12 +17,10 @@ public:
     void DisplayCurrentState();
 
 private:
-    i2c_config_t connectionConfiguration_ = {};
     i2c_lcd1602_info_t* LcdInfo_ = new i2c_lcd1602_info_t;
     bool isBacklight_ = true;
     std::uint64_t backlightTimer_ = esp_timer_get_time();
 
-    void InitializeConnectionConfiguration();
     template<typename T>
     std::string ConvertNumberToString(T number, std::uint8_t precision) const;
     void DisplayLine(std::string& line, std::uint8_t row) const;
