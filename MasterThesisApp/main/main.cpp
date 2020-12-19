@@ -14,7 +14,8 @@ void app_main();
 
 void app_main(void) {
     InterruptHandler::Start();
-    I2CWrapper::Start();
+    auto& I2cWrapper = I2CWrapper::getInstance();
+    I2cWrapper.ConfigureCommunication();
     LCD Lcd = LCD();
     for (;;) {
         std::cout << "Display state: " << InterruptHandler::GetDisplayState()

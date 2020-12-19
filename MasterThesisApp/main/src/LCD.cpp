@@ -16,8 +16,9 @@
 #include <cmath>
 
 LCD::LCD() {
+    auto& I2cWrapper = I2CWrapper::getInstance();
     i2c_lcd1602_init(LcdInfo_,
-                     I2CWrapper::GetsmBusInfoDisplay_(),
+                     I2cWrapper.GetsmBusInfoDisplay_(),
                      true,
                      2,
                      32,

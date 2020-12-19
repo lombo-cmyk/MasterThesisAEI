@@ -5,11 +5,7 @@
 #include "include/I2CWrapper.h"
 #include "include/Definitions.h"
 
-i2c_config_t I2CWrapper::connectionConfiguration_={};
-smbus_info_t* I2CWrapper::smBusInfoDisplay_ = {};
-
-
-void I2CWrapper::ConfigureConnection() {
+void I2CWrapper::ConfigureConnectionDetails() {
     connectionConfiguration_.mode = I2C_MODE_MASTER;
     connectionConfiguration_.sda_io_num = LCD_SDA_PIN;
     connectionConfiguration_.scl_io_num = LCD_SCL_PIN;
@@ -22,11 +18,11 @@ void I2CWrapper::ConfigureConnection() {
 
 void I2CWrapper::ConfigureDisplaySettings() {
     auto smbus_info = new smbus_info_t;
-    smbus_init(smbus_info, i2cInterface, displayAddress_);
+    smbus_init(smbus_info, i2cInterface_, displayAddress_);
     smbus_set_timeout(smbus_info, 1000 / portTICK_RATE_MS);
     smBusInfoDisplay_ = smbus_info;
 }
-void I2CWrapper::Start() {
-    I2CWrapper::ConfigureConnection();
+void I2CWrapper::ConfigureCommunication() {
+    I2CWrapper::ConfigureConnectionDetails();
     I2CWrapper::ConfigureDisplaySettings();
 }
