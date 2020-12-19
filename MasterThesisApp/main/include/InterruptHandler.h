@@ -21,8 +21,6 @@ public:
         return lcdBacklight_;
     }
 
-
-
 private:
     static std::uint16_t displayState_;
     static bool lcdBacklight_;

@@ -12,13 +12,13 @@ extern "C" {
 void app_main();
 }
 
-void app_main(void)
-{
+void app_main(void) {
     InterruptHandler::Start();
     I2CWrapper I2CBus = I2CWrapper();
     LCD Lcd = LCD();
-    for(;;){
-        std::cout << "Display state: " << InterruptHandler::GetDisplayState() << std::endl;
+    for (;;) {
+        std::cout << "Display state: " << InterruptHandler::GetDisplayState()
+                  << std::endl;
         Lcd.DisplayCurrentState();
     }
 }

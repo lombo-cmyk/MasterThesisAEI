@@ -67,7 +67,6 @@ std::string LCD::ConvertNumberToString(T number,
     return stringStream.str();
 }
 
-
 void LCD::DisplayWelcomeMessage() const {
     std::string welcomeMessage1 = "Welcome to";
     std::string welcomeMessage2 = "MasterThesis v1";
@@ -114,30 +113,30 @@ void LCD::Setbacklight(const std::uint16_t& displayState) {
 }
 
 void LCD::DisplayCurrentState() {
-    std::uint16_t  currentState = InterruptHandler::GetDisplayState();
+    std::uint16_t currentState = InterruptHandler::GetDisplayState();
     std::string state = "State no";
     std::string noState = ConvertNumberToString(currentState, 1);
     switch (currentState) {
-        case 0:
-            DisplayPMMeasure_25();
-            break;
-        case 1:
-            DisplayPMMeasure_10();
-            break;
-        case 2:
-            DisplayCOMeasure();
-            break;
-        case 3:
-            DisplayCO2Measure();
-            break;
-        case 4:
-            DisplayTempMeasure();
-            break;
-        case 5:
-            DisplayHumidityMeasure();
-            break;
-        default:
-            DisplayTwoLines(state, noState);
+    case 0:
+        DisplayPMMeasure_25();
+        break;
+    case 1:
+        DisplayPMMeasure_10();
+        break;
+    case 2:
+        DisplayCOMeasure();
+        break;
+    case 3:
+        DisplayCO2Measure();
+        break;
+    case 4:
+        DisplayTempMeasure();
+        break;
+    case 5:
+        DisplayHumidityMeasure();
+        break;
+    default:
+        DisplayTwoLines(state, noState);
     }
 }
 

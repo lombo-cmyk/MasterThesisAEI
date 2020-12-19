@@ -7,15 +7,14 @@
 
 #include "driver/i2c.h"
 
-class I2CWrapper{
+class I2CWrapper {
 public:
     I2CWrapper();
+
 private:
-//    void BusInit();
+    //    void BusInit();
     void ConfigureConnection();
     i2c_config_t connectionConfiguration_ = {};
-
 };
 
-
-#endif //MASTERTHESISAPP_I2CWRAPPER_H
+#endif // MASTERTHESISAPP_I2CWRAPPER_H
