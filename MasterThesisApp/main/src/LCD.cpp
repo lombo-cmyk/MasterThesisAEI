@@ -8,6 +8,7 @@
 #include "include/Definitions.h"
 #include "include/InterruptHandler.h"
 #include "string"
+#include "include/I2CWrapper.h"
 #include <stdexcept>
 #include <iomanip>
 #include <sstream>
@@ -15,29 +16,16 @@
 #include <cmath>
 
 LCD::LCD() {
-    InitializeConnectionConfiguration();
-    i2c_port_t i2c_num = I2C_NUM_0;
-    uint8_t address = 0x27;
-    auto smbus_info = new smbus_info_t;
-    ESP_ERROR_CHECK(smbus_init(smbus_info, i2c_num, address));
-    ESP_ERROR_CHECK(smbus_set_timeout(smbus_info, 1000 / portTICK_RATE_MS));
-    ESP_ERROR_CHECK(
-        i2c_lcd1602_init(LcdInfo_, smbus_info, true, 2, 32, LCD_COLUMNS));
-
-    ESP_ERROR_CHECK(i2c_lcd1602_reset(LcdInfo_));
+    auto& I2cWrapper = I2CWrapper::getInstance();
+    i2c_lcd1602_init(LcdInfo_,
+                     I2cWrapper.GetsmBusInfoDisplay_(),
+                     true,
+                     2,
+                     32,
+                     LCD_COLUMNS);
+    i2c_lcd1602_reset(LcdInfo_);
     i2c_lcd1602_set_backlight(LcdInfo_, isBacklight_);
     DisplayWelcomeMessage();
-}
-
-void LCD::InitializeConnectionConfiguration() {
-    connectionConfiguration_.mode = I2C_MODE_MASTER;
-    connectionConfiguration_.sda_io_num = LCD_SDA_PIN;
-    connectionConfiguration_.scl_io_num = LCD_SCL_PIN;
-    connectionConfiguration_.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    connectionConfiguration_.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    connectionConfiguration_.master.clk_speed = 100000;
-    i2c_param_config(I2C_NUM_0, &connectionConfiguration_);
-    i2c_driver_install(I2C_NUM_0, connectionConfiguration_.mode, 0, 0, 0);
 }
 
 void LCD::AdjustLine(std::string& line) {
@@ -78,7 +66,6 @@ std::string LCD::ConvertNumberToString(T number,
     stringStream << std::fixed << std::setprecision(precision) << number;
     return stringStream.str();
 }
-
 
 void LCD::DisplayWelcomeMessage() const {
     std::string welcomeMessage1 = "Welcome to";
@@ -126,30 +113,30 @@ void LCD::Setbacklight(const std::uint16_t& displayState) {
 }
 
 void LCD::DisplayCurrentState() {
-    std::uint16_t  currentState = InterruptHandler::GetDisplayState();
+    std::uint16_t currentState = InterruptHandler::GetDisplayState();
     std::string state = "State no";
     std::string noState = ConvertNumberToString(currentState, 1);
     switch (currentState) {
-        case 0:
-            DisplayPMMeasure_25();
-            break;
-        case 1:
-            DisplayPMMeasure_10();
-            break;
-        case 2:
-            DisplayCOMeasure();
-            break;
-        case 3:
-            DisplayCO2Measure();
-            break;
-        case 4:
-            DisplayTempMeasure();
-            break;
-        case 5:
-            DisplayHumidityMeasure();
-            break;
-        default:
-            DisplayTwoLines(state, noState);
+    case 0:
+        DisplayPMMeasure_25();
+        break;
+    case 1:
+        DisplayPMMeasure_10();
+        break;
+    case 2:
+        DisplayCOMeasure();
+        break;
+    case 3:
+        DisplayCO2Measure();
+        break;
+    case 4:
+        DisplayTempMeasure();
+        break;
+    case 5:
+        DisplayHumidityMeasure();
+        break;
+    default:
+        DisplayTwoLines(state, noState);
     }
 }
 

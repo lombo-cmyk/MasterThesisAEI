@@ -8,7 +8,6 @@ std::uint16_t InterruptHandler::displayState_ = 0;
 bool InterruptHandler::lcdBacklight_ = true;
 TickType_t InterruptHandler::lastWakeTimeForwardButton_ = xTaskGetTickCount();
 
-
 void InterruptHandler::DisplayNextState(void* arg) {
     if ((xTaskGetTickCount() - lastWakeTimeForwardButton_) > DEBOUNCE_TIME) {
         displayState_++;
