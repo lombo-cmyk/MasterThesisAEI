@@ -8,6 +8,7 @@
 #include "include/Definitions.h"
 #include "include/InterruptHandler.h"
 #include "string"
+#include "include/I2CWrapper.h"
 #include <stdexcept>
 #include <iomanip>
 #include <sstream>
@@ -15,15 +16,13 @@
 #include <cmath>
 
 LCD::LCD() {
-    i2c_port_t i2c_num = I2C_NUM_0;
-    uint8_t address = 0x27;
-    auto smbus_info = new smbus_info_t;
-    ESP_ERROR_CHECK(smbus_init(smbus_info, i2c_num, address));
-    ESP_ERROR_CHECK(smbus_set_timeout(smbus_info, 1000 / portTICK_RATE_MS));
-    ESP_ERROR_CHECK(
-        i2c_lcd1602_init(LcdInfo_, smbus_info, true, 2, 32, LCD_COLUMNS));
-
-    ESP_ERROR_CHECK(i2c_lcd1602_reset(LcdInfo_));
+    i2c_lcd1602_init(LcdInfo_,
+                     I2CWrapper::GetsmBusInfoDisplay_(),
+                     true,
+                     2,
+                     32,
+                     LCD_COLUMNS);
+    i2c_lcd1602_reset(LcdInfo_);
     i2c_lcd1602_set_backlight(LcdInfo_, isBacklight_);
     DisplayWelcomeMessage();
 }
