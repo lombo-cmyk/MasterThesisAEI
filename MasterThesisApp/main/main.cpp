@@ -6,6 +6,7 @@
 #include "include/LCD.h"
 #include "include/InterruptHandler.h"
 #include "include//I2CWrapper.h"
+#include "include/PressureSensor.h"
 #include <iostream>
 #include "esp_log.h"
 
@@ -20,10 +21,12 @@ void app_main(void) {
     auto& I2cWrapper = I2CWrapper::getInstance();
     I2cWrapper.ConfigureCommunication();
     LCD Lcd = LCD();
+    PressureSensor pressureSensor = PressureSensor();
     for (;;) {
         vTaskDelay(SECOND/10);
 //        std::cout << "Display state: " << intHandler.GetDisplayState()
 //                  << std::endl;
         Lcd.DisplayCurrentState();
+        pressureSensor.ReadPressure();
     }
 }
