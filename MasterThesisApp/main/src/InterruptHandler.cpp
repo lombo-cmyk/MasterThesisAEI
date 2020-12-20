@@ -9,7 +9,7 @@ void InterruptHandler::DisplayNextState(void* arg) {
     if ((xTaskGetTickCount() - instance.lastWakeTimeForwardButton_) >
         DEBOUNCE_TIME) {
         instance.displayState_++;
-        if (instance.displayState_ > instance.maxDisplayStates) {
+        if (instance.displayState_ > instance.maxDisplayStates_) {
             instance.displayState_ = 0;
         }
         instance.lastWakeTimeForwardButton_ = xTaskGetTickCount();

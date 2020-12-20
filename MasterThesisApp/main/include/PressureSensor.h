@@ -25,6 +25,11 @@ private:
 
     smbus_info_t* PressureCommunicationInfo_ = new smbus_info_t;
     std::uint8_t dataFromSensor_;
+
+    esp_err_t WriteByte(std::uint8_t reg, std::uint8_t data);
+    esp_err_t ReadByte(std::uint8_t reg, std::uint8_t &data);
+    esp_err_t SetValuesInByte(std::uint8_t reg, uint8_t byte);
+    esp_err_t ResetValuesInByte(std::uint8_t reg, uint8_t byte);
 };
 
 #endif // MASTERTHESISAPP_PRESSURESENSOR_H
