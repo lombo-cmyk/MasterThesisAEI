@@ -18,4 +18,7 @@
 #define DEBOUNCE_TIME 10 // 70 needed w/o proper HW debouncing
 #define LCD_COLUMNS 16
 #define SECOND 1000
+
+constexpr char deviceLCD[] = "LCD";
+constexpr char devicePressSens[] = "PressureSensor";
 #endif // AIRCONTROLLER_PINS_H
