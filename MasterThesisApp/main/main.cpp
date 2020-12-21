@@ -23,9 +23,6 @@ void app_main(void) {
     LCD Lcd = LCD();
     PressureSensor pressureSensor = PressureSensor();
     for (;;) {
-//        vTaskDelay(SECOND/10);
-//        std::cout << "Display state: " << intHandler.GetDisplayState()
-//                  << std::endl;
         Lcd.DisplayCurrentState();
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();

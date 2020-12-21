@@ -5,10 +5,11 @@
 #ifndef MASTERTHESISAPP_PRESSURESENSOR_H
 #define MASTERTHESISAPP_PRESSURESENSOR_H
 
-#include "smbus.h"
-#include "I2CWrapper.h"
-#include <cstdint>
 #include <bitset>
+#include <cstdint>
+#include "I2CWrapper.h"
+#include "smbus.h"
+
 class PressureSensor {
 public:
     PressureSensor();
@@ -27,6 +28,7 @@ public:
     auto GetTemperature() const -> const double& {
         return tempData_;
     }
+
 private:
     static constexpr std::uint_fast8_t whoIAmReg_{0x0F};
     static constexpr std::uint8_t ctrlReg1_{0x20};
@@ -46,19 +48,19 @@ private:
     std::bitset<16> rawTempData_;
 
     double tempData_ = 0;
-    void ReadPressure();
-    void ReadTemperature();
     void TurnDeviceOn();
     void TurnDeviceOff();
+    void ReadPressure();
+    void ReadTemperature();
     bool isProbeAvailable() const;
 
     template<std::size_t B>
     void SaveDataFromSensor(const std::bitset<8>& dataFrom,
                             std::bitset<B>& dataTo);
     esp_err_t ReadByte(std::uint8_t reg, std::bitset<8>& data) const;
-    esp_err_t WriteByte(std::uint8_t reg, std::bitset<8> data);
     esp_err_t SetValueInByte(std::uint8_t reg, std::uint8_t position);
     esp_err_t ResetValueInByte(std::uint8_t reg, std::uint8_t position);
+    esp_err_t WriteByte(std::uint8_t reg, std::bitset<8> data);
     static std::bitset<8> ConvertToBitset(std::uint8_t byte);
     static std::uint8_t ConvertToUint8(std::bitset<8> byte);
     template<std::size_t B>

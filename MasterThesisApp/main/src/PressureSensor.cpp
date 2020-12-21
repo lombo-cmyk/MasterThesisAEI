@@ -2,12 +2,11 @@
 // Created by lukaszk on 19.12.2020.
 //
 
+#include <bitset>
+#include <iostream>
 #include "include/PressureSensor.h"
 #include "smbus.h"
-#include <iostream>
-#include <bitset>
 #include "include/Definitions.h"
-
 #include "esp_log.h"
 
 PressureSensor::PressureSensor() {
@@ -17,17 +16,6 @@ PressureSensor::PressureSensor() {
     EnableOneMeasure();
 }
 
-void PressureSensor::TurnDeviceOn() {
-    SetValueInByte(ctrlReg1_, turnOnIndex);
-    std::bitset<8> byte;
-    ReadByte(ctrlReg1_, byte);
-    if (!byte.test(turnOnIndex)) {
-        ESP_LOGE(devicePressSens, "Device off, reg: %lu", byte.to_ulong());
-    }
-}
-void PressureSensor::TurnDeviceOff() {
-    ResetValueInByte(ctrlReg1_, turnOnIndex);
-}
 void PressureSensor::EnableOneMeasure() {
     SetValueInByte(ctrlReg2_, oneMeasureIndex);
     std::bitset<8> byte;
@@ -43,6 +31,17 @@ void PressureSensor::PerformReadOut() {
         ReadTemperature();
         ESP_LOGI(devicePressSens, "Temp is: %f", tempData_);
     }
+}
+void PressureSensor::TurnDeviceOn() {
+    SetValueInByte(ctrlReg1_, turnOnIndex);
+    std::bitset<8> byte;
+    ReadByte(ctrlReg1_, byte);
+    if (!byte.test(turnOnIndex)) {
+        ESP_LOGE(devicePressSens, "Device off, reg: %lu", byte.to_ulong());
+    }
+}
+void PressureSensor::TurnDeviceOff() {
+    ResetValueInByte(ctrlReg1_, turnOnIndex);
 }
 
 void PressureSensor::ReadPressure() {
@@ -66,6 +65,13 @@ void PressureSensor::ReadTemperature() {
     SaveDataFromSensor(data, rawTempData_);
     tempData_ = 42.5 + ConvertToLong(rawTempData_) / 480.0;
 }
+bool PressureSensor::isProbeAvailable() const {
+    std::bitset<8> data;
+    std::size_t pressureBitIndex = 1;
+    ReadByte(statusReg_, data);
+    std::cout << "measure ready? 000010: " << data << std::endl;
+    return data.test(pressureBitIndex);
+}
 template<std::size_t B>
 void PressureSensor::SaveDataFromSensor(const std::bitset<8>& dataFrom,
                                         std::bitset<B>& dataTo) {
@@ -73,12 +79,13 @@ void PressureSensor::SaveDataFromSensor(const std::bitset<8>& dataFrom,
         dataTo[i] = dataFrom[i];
     }
 }
-bool PressureSensor::isProbeAvailable() const {
-    std::bitset<8> data;
-    std::size_t pressureBitIndex = 1;
-    ReadByte(statusReg_, data);
-    std::cout << "measure ready? 000010: " << data << std::endl;
-    return data.test(pressureBitIndex);
+esp_err_t PressureSensor::ReadByte(std::uint8_t reg,
+                                   std::bitset<8>& data) const {
+    esp_err_t err;
+    std::uint8_t byte = ConvertToUint8(data);
+    err = smbus_read_byte(PressureCommunicationInfo_, reg, &byte);
+    data = ConvertToBitset(byte);
+    return err;
 }
 esp_err_t PressureSensor::SetValueInByte(std::uint8_t reg,
                                          std::uint8_t position) {
@@ -93,14 +100,6 @@ esp_err_t PressureSensor::ResetValueInByte(std::uint8_t reg,
     ReadByte(reg, valueInRegister);
     valueInRegister.reset(static_cast<int>(position));
     return WriteByte(reg, valueInRegister);
-}
-esp_err_t PressureSensor::ReadByte(std::uint8_t reg,
-                                   std::bitset<8>& data) const {
-    esp_err_t err;
-    std::uint8_t byte = ConvertToUint8(data);
-    err = smbus_read_byte(PressureCommunicationInfo_, reg, &byte);
-    data = ConvertToBitset(byte);
-    return err;
 }
 esp_err_t PressureSensor::WriteByte(std::uint8_t reg, std::bitset<8> data) {
     return smbus_write_byte(PressureCommunicationInfo_,
