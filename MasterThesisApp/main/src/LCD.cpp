@@ -25,7 +25,21 @@ LCD::LCD() {
     i2c_lcd1602_set_backlight(LcdInfo_, isBacklight_);
     DisplayWelcomeMessage();
 }
-
+void LCD::GetCurrentMeasurements(double pm25,
+                                 double pm10,
+                                 double co,
+                                 double co2,
+                                 double t,
+                                 double h,
+                                 unsigned int p) {
+    PM25_=pm25;
+    PM10_=pm10;
+    CO_=co;
+    CO2_=co2;
+    temperature_=t;
+    humidity_=h;
+    pressure_=p;
+}
 void LCD::AdjustLine(std::string& line) {
     std::string buf;
     buf.reserve(16);
@@ -37,7 +51,6 @@ void LCD::AdjustLine(std::string& line) {
     buf.insert(std::end(buf), endingChars, ' ');
     line = buf;
 }
-
 void LCD::DisplayLine(std::string& line, std::uint8_t row) const {
     std::uint8_t pos = 0;
     if (line.length() > 16) {
@@ -52,6 +65,7 @@ void LCD::DisplayLine(std::string& line, std::uint8_t row) const {
         i2c_lcd1602_write_char(LcdInfo_, letter);
     }
 }
+
 void LCD::DisplayTwoLines(std::string& line_1, std::string& line_2) const {
     DisplayLine(line_1, 0);
     DisplayLine(line_2, 1);
@@ -116,60 +130,67 @@ void LCD::DisplayCurrentState() {
     std::string noState = ConvertNumberToString(currentState, 1);
     switch (currentState) {
     case 0:
-        DisplayPMMeasure_25();
+        DisplayPM25();
         break;
     case 1:
-        DisplayPMMeasure_10();
+        DisplayPM10();
         break;
     case 2:
-        DisplayCOMeasure();
+        DisplayCO();
         break;
     case 3:
-        DisplayCO2Measure();
+        DisplayCO2();
         break;
     case 4:
-        DisplayTempMeasure();
+        DisplayTemperature();
         break;
     case 5:
-        DisplayHumidityMeasure();
+        DisplayHumidity();
+        break;
+    case 6:
+        DisplayPressure();
         break;
     default:
         DisplayTwoLines(state, noState);
     }
 }
 
-void LCD::DisplayPMMeasure_25() {
+void LCD::DisplayPM25() {
     std::string firstLine = "PM 2.5";
-    std::string secondLine = "000";
+    std::string secondLine = ConvertNumberToString(PM25_, 2);
     DisplayTwoLines(firstLine, secondLine);
 }
 
-void LCD::DisplayPMMeasure_10() {
+void LCD::DisplayPM10() {
     std::string firstLine = "PM 10";
-    std::string secondLine = "000";
+    std::string secondLine = ConvertNumberToString(PM10_, 2);
     DisplayTwoLines(firstLine, secondLine);
 }
 
-void LCD::DisplayCOMeasure() {
+void LCD::DisplayCO() {
     std::string firstLine = "CO";
-    std::string secondLine = "000";
+    std::string secondLine = ConvertNumberToString(CO_, 2);
     DisplayTwoLines(firstLine, secondLine);
 }
 
-void LCD::DisplayCO2Measure() {
+void LCD::DisplayCO2() {
     std::string firstLine = "CO2";
-    std::string secondLine = "000";
+    std::string secondLine = ConvertNumberToString(CO2_, 2);
     DisplayTwoLines(firstLine, secondLine);
 }
 
-void LCD::DisplayTempMeasure() {
+void LCD::DisplayTemperature() {
     std::string firstLine = "Temperature";
-    std::string secondLine = "000";
+    std::string secondLine = ConvertNumberToString(temperature_, 2);
     DisplayTwoLines(firstLine, secondLine);
 }
-
-void LCD::DisplayHumidityMeasure() {
+void LCD::DisplayHumidity() {
     std::string firstLine = "Humidity";
-    std::string secondLine = "000";
+    std::string secondLine = ConvertNumberToString(humidity_, 2);
+    DisplayTwoLines(firstLine, secondLine);
+}
+void LCD::DisplayPressure() {
+    std::string firstLine = "Pressure";
+    std::string secondLine = ConvertNumberToString(pressure_, 2);
     DisplayTwoLines(firstLine, secondLine);
 }

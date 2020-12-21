@@ -16,6 +16,9 @@ void app_main();
 
 void app_main(void) {
     vTaskDelay(SECOND/10);
+    double PM25 = 0, PM10 = 0, CO = 0, CO2 = 0, temperature = 0,
+        humidity = 0;
+    unsigned int pressure = 0;
     auto& intHandler = InterruptHandler::getInstance();
     intHandler.InitializeInterrupts();
     auto& I2cWrapper = I2CWrapper::getInstance();
@@ -23,8 +26,11 @@ void app_main(void) {
     LCD Lcd = LCD();
     PressureSensor pressureSensor = PressureSensor();
     for (;;) {
-        Lcd.DisplayCurrentState();
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
+        pressure = pressureSensor.GetPressure();
+        temperature = pressureSensor.GetTemperature();
+        Lcd.GetCurrentMeasurements(PM25, PM10, CO, CO2, temperature, humidity, pressure);
+        Lcd.DisplayCurrentState();
     }
 }

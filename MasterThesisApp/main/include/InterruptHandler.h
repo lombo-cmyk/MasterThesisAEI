@@ -27,7 +27,7 @@ private:
     std::uint16_t displayState_ = 0;
     bool lcdBacklight_ = true;
     TickType_t lastWakeTimeForwardButton_ = xTaskGetTickCount();
-    const std::uint16_t maxDisplayStates_ = 5;
+    const std::uint16_t maxDisplayStates_ = 6;
     static void DisplayNextState(void* arg);
 };
 
