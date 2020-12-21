@@ -27,6 +27,7 @@ void app_main(void) {
 //        std::cout << "Display state: " << intHandler.GetDisplayState()
 //                  << std::endl;
         Lcd.DisplayCurrentState();
-        pressureSensor.ReadPressure();
+        pressureSensor.PerformReadOut();
+        pressureSensor.EnableOneMeasure();
     }
 }

@@ -19,7 +19,7 @@ public:
     auto SetBacklightFromLcd() -> bool& {
         return lcdBacklight_;
     }
-    auto GetLcdBacklight() -> const bool& {
+    auto GetLcdBacklight() const -> const bool& {
         return lcdBacklight_;
     }
 

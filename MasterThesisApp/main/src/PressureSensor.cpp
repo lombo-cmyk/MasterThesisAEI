@@ -7,6 +7,7 @@
 #include <iostream>
 #include <bitset>
 #include "include/Definitions.h"
+
 #include "esp_log.h"
 
 PressureSensor::PressureSensor() {
@@ -17,48 +18,64 @@ PressureSensor::PressureSensor() {
 }
 
 void PressureSensor::TurnDeviceOn() {
-    SetValueInByte(ctrlReg1_, deviceOnCmd_);
-    std::bitset<8> a;
-    ReadByte(ctrlReg1_, a);
-    std::cout << "Device oN? 100000: " << a << std::endl;
+    SetValueInByte(ctrlReg1_, turnOnIndex);
+    std::bitset<8> byte;
+    ReadByte(ctrlReg1_, byte);
+    if (!byte.test(turnOnIndex)) {
+        ESP_LOGE(devicePressSens, "Device off, reg: %lu", byte.to_ulong());
+    }
 }
-
 void PressureSensor::TurnDeviceOff() {
-    ResetValueInByte(ctrlReg1_, deviceOnCmd_);
+    ResetValueInByte(ctrlReg1_, turnOnIndex);
 }
 void PressureSensor::EnableOneMeasure() {
-    SetValueInByte(ctrlReg2_, oneMeasureCmd_);
-    std::bitset<8> a;
-    ReadByte(ctrlReg2_, a);
-    std::cout << "measure on? 000001: " << a << std::endl;
+    SetValueInByte(ctrlReg2_, oneMeasureIndex);
+    std::bitset<8> byte;
+    ReadByte(ctrlReg2_, byte);
+    if (!byte.test(oneMeasureIndex)) {
+        ESP_LOGE(devicePressSens, "Measuring off: reg: %lu", byte.to_ulong());
+    }
 }
-void PressureSensor::ReadPressure() {
-    esp_err_t err;
+void PressureSensor::PerformReadOut() {
     if (isProbeAvailable()) {
-        std::bitset<8> data;
-        ReadByte(pressureHighReg_, data);
-        SaveDataFromSensor(data);
-        rawDataFromSensor_ = rawDataFromSensor_ << 8;
-        ReadByte(pressureMidReg_, data);
-        SaveDataFromSensor(data);
-        rawDataFromSensor_ = rawDataFromSensor_ << 8;
-        ReadByte(pressureLowReg_, data);
-        SaveDataFromSensor(data);
-        dataFromSensor_ = rawDataFromSensor_.to_ulong() / 4096;
-        ESP_LOGI(devicePressSens,
-                 "Pressure is: %lu",
-                 rawDataFromSensor_.to_ulong() / 4096);
+        ReadPressure();
+        ESP_LOGI(devicePressSens, "Pressure is: %du", pressureData_);
+        ReadTemperature();
+        ESP_LOGI(devicePressSens, "Temp is: %f", tempData_);
     }
 }
 
-void PressureSensor::SaveDataFromSensor(const std::bitset<8>& data) {
-    for (std::uint8_t i = 0; i < 8; i++) {
-        rawDataFromSensor_[i] = data[i];
+void PressureSensor::ReadPressure() {
+    std::bitset<8> data;
+    ReadByte(pressureHighReg_, data);
+    SaveDataFromSensor(data, rawPressureData_);
+    rawPressureData_ = rawPressureData_ << 8;
+    ReadByte(pressureMidReg_, data);
+    SaveDataFromSensor(data, rawPressureData_);
+    rawPressureData_ = rawPressureData_ << 8;
+    ReadByte(pressureLowReg_, data);
+    SaveDataFromSensor(data, rawPressureData_);
+    pressureData_ = rawPressureData_.to_ulong() / 4096;
+}
+void PressureSensor::ReadTemperature() {
+    std::bitset<8> data;
+    ReadByte(tempHighReg_, data);
+    SaveDataFromSensor(data, rawTempData_);
+    rawTempData_ = rawTempData_ << 8;
+    ReadByte(tempLowReg_, data);
+    SaveDataFromSensor(data, rawTempData_);
+    tempData_ = 42.5 + ConvertToLong(rawTempData_) / 480.0;
+}
+template<std::size_t B>
+void PressureSensor::SaveDataFromSensor(const std::bitset<8>& dataFrom,
+                                        std::bitset<B>& dataTo) {
+    for (std::size_t i = 0; i < 8; i++) {
+        dataTo[i] = dataFrom[i];
     }
 }
 bool PressureSensor::isProbeAvailable() const {
     std::bitset<8> data;
-    std::uint8_t pressureBitIndex = 1;
+    std::size_t pressureBitIndex = 1;
     ReadByte(statusReg_, data);
     std::cout << "measure ready? 000010: " << data << std::endl;
     return data.test(pressureBitIndex);
@@ -92,8 +109,15 @@ esp_err_t PressureSensor::WriteByte(std::uint8_t reg, std::bitset<8> data) {
 }
 std::bitset<8> PressureSensor::ConvertToBitset(std::uint8_t byte) {
     return static_cast<std::bitset<8>>(byte);
-    ;
 }
 std::uint8_t PressureSensor::ConvertToUint8(std::bitset<8> byte) {
     return static_cast<uint8_t>(byte.to_ulong());
+}
+template<std::size_t B>
+long PressureSensor::ConvertToLong(const std::bitset<B>& b) {
+    //© 1997-2005 Bit Twiddling Hacks Sean Eron Anderson
+    struct {
+        long x : B;
+    } s;
+    return s.x = b.to_ulong();
 }
