@@ -5,39 +5,41 @@
 #ifndef MASTERTHESISAPP_PRESSURESENSOR_H
 #define MASTERTHESISAPP_PRESSURESENSOR_H
 
-#define STATUS_REG 0x27
-#define CTRL_REG1 0x20
-#define DEVICE_ON_CMD 0b10000000
-
-
 #include "smbus.h"
 #include "I2CWrapper.h"
-
+#include <cstdint>
+#include <bitset>
 class PressureSensor {
 public:
     PressureSensor();
     void ReadPressure();
+
 private:
-    static constexpr std::uint8_t whoIAmReg_ = 0x0F;
-    static constexpr std::uint8_t ctrlReg1_ = 0x20;
-    static constexpr std::uint8_t ctrlReg2_ = 0x21;
-    static constexpr std::uint8_t statusReg_ = 0x27;
-    static constexpr std::uint8_t deviceOnCmd_ = 0b10000000;
-    static constexpr std::uint8_t resetRegisterCmd_ = 0xFF;
-    static constexpr std::uint8_t oneMeasureCmd_ = 0b1;
+    static constexpr std::uint_fast8_t whoIAmReg_{0x0F};
+    static constexpr std::uint8_t ctrlReg1_{0x20};
+    static constexpr std::uint8_t ctrlReg2_{0x21};
+    static constexpr std::uint8_t statusReg_{0x27};
+    static constexpr std::uint8_t pressureLowReg_{0x28};
+    static constexpr std::uint8_t pressureMidReg_{0x29};
+    static constexpr std::uint8_t pressureHighReg_{0x2A};
+    static constexpr std::uint8_t oneMeasureCmd_ = 0;
+    static constexpr std::uint8_t deviceOnCmd_ = 7;
 
     smbus_info_t* PressureCommunicationInfo_ = new smbus_info_t;
-    std::uint8_t dataFromSensor_;
+    std::bitset<24> rawDataFromSensor_;
+    unsigned int dataFromSensor_;
 
-    esp_err_t WriteByte(std::uint8_t reg, std::uint8_t data);
-    esp_err_t ReadByte(std::uint8_t reg, std::uint8_t &data) const;
-    esp_err_t SetValuesInByte(std::uint8_t reg, uint8_t byte);
-    esp_err_t ResetValuesInByte(std::uint8_t reg, uint8_t byte);
+    esp_err_t WriteByte(std::uint8_t reg, std::bitset<8> data);
+    esp_err_t ReadByte(std::uint8_t reg, std::bitset<8>& data) const;
+    esp_err_t SetValueInByte(std::uint8_t reg, std::uint8_t position);
+    esp_err_t ResetValueInByte(std::uint8_t reg, std::uint8_t position);
     void TurnDeviceOn();
     void TurnDeviceOff();
-    void StartMeasure();
+    void EnableOneMeasure();
     bool isProbeAvailable() const;
-    static bool isBitSet(std::uint8_t byte, std::uint8_t bitIndex);
+    static std::bitset<8> ConvertToBitset(std::uint8_t byte);
+    static std::uint8_t ConvertToUint8(std::bitset<8> byte);
+    void SaveDataFromSensor(const std::bitset<8>& data);
 };
 
 #endif // MASTERTHESISAPP_PRESSURESENSOR_H
