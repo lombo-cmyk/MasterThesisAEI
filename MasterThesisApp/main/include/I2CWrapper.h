@@ -22,17 +22,23 @@ public:
     auto GetsmBusInfoPressure_() -> smbus_info_t* {
         return smBusInfoPressureSensor_;
     }
+    auto GetsmBusInfoPm() -> smbus_info_t* {
+        return smBusInfoPm_;
+    }
 private:
     const uint8_t displayAddress_ = 0x27;
     const uint8_t pressureSensorAddress_ = 0x5D; // B9 b1011101 -> last bit is Read(1) / Write(1)
+    const uint8_t pmSensorAddress_ = 0x69;
     const i2c_port_t i2cInterface_ = I2C_NUM_0;
     smbus_info_t* smBusInfoDisplay_ = {};
     smbus_info_t* smBusInfoPressureSensor_ = {};
+    smbus_info_t* smBusInfoPm_ = {};
     i2c_config_t connectionConfiguration_ = {};
     bool isInit(const smbus_info_t* busInfo,const char* deviceName);
     void ConfigureConnectionDetails();
     void ConfigureDisplayBusInfo();
     void ConfigurePressureSensorBusInfo();
+    void ConfigurePmSensorBusInfo();
 };
 
 #endif // MASTERTHESISAPP_I2CWRAPPER_H

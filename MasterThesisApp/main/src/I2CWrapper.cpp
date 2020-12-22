@@ -33,6 +33,13 @@ void I2CWrapper::ConfigurePressureSensorBusInfo() {
     smBusInfoPressureSensor_ = smbus_info;
 }
 
+void I2CWrapper::ConfigurePmSensorBusInfo() {
+    auto smbus_info = new smbus_info_t;
+    smbus_init(smbus_info, i2cInterface_, pmSensorAddress_);
+    smbus_set_timeout(smbus_info, 10000 / portTICK_RATE_MS);
+    smBusInfoPm_ = smbus_info;
+}
+
 bool I2CWrapper::isInit(const smbus_info_t* busInfo, const char* deviceName) {
     bool ok = false;
     if (busInfo != nullptr) {
@@ -56,8 +63,10 @@ void I2CWrapper::ConfigureCommunication() {
     I2CWrapper::ConfigurePressureSensorBusInfo();
     I2CWrapper::isInit(smBusInfoPressureSensor_, devicePressSens);
     I2CWrapper::pingDevice(smBusInfoPressureSensor_, devicePressSens);
+    I2CWrapper::ConfigurePmSensorBusInfo();
+    I2CWrapper::isInit(smBusInfoPm_, devicePmSens);
+    I2CWrapper::pingDevice(smBusInfoPm_, devicePmSens);
 }
-
 void I2CWrapper::pingDevice(smbus_info_t* busInfo, const char* device) {
     esp_err_t error = smbus_quick(busInfo, I2C_MASTER_WRITE);
     if (error == ESP_OK) {

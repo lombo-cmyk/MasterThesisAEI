@@ -87,12 +87,12 @@ void PressureSensor::SaveDataFromSensor(const std::bitset<From>& dataFrom,
 template<std::size_t B>
 esp_err_t PressureSensor::ReadBytes(std::uint8_t reg,
                                     std::bitset<B>& data) const {
+    esp_err_t err;
     std::size_t noBytes = B / 8;
+    std::uint8_t byte[noBytes];
     if (noBytes > 1) {
         reg |= 0b10000000u;
     }
-    esp_err_t err;
-    std::uint8_t byte[noBytes];
     err = smbus_i2c_read_block(PressureCommunicationInfo_, reg, byte, noBytes);
     for (std::size_t i = noBytes - 1; i > 0; i--) {
         data |= byte[i] << (8 * i);
