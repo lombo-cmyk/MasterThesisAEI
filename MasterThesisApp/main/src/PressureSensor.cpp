@@ -17,7 +17,8 @@ PressureSensor::PressureSensor() {
 }
 
 void PressureSensor::EnableOneMeasure() {
-    SetValueInByte(ctrlReg2_, oneMeasureIndex);
+    std::array<std::uint8_t, 1> positions{oneMeasureIndex};
+    SetValuesInByte(ctrlReg2_, positions);
     std::bitset<8> byte;
     ReadByte(ctrlReg2_, byte);
     if (!byte.test(oneMeasureIndex)) {
@@ -33,7 +34,8 @@ void PressureSensor::PerformReadOut() {
     }
 }
 void PressureSensor::TurnDeviceOn() {
-    SetValueInByte(ctrlReg1_, turnOnIndex);
+    std::array<std::uint8_t, 1> positions{turnOnIndex};
+    SetValuesInByte(ctrlReg1_, positions);
     std::bitset<8> byte;
     ReadByte(ctrlReg1_, byte);
     if (!byte.test(turnOnIndex)) {
@@ -41,7 +43,8 @@ void PressureSensor::TurnDeviceOn() {
     }
 }
 void PressureSensor::TurnDeviceOff() {
-    ResetValueInByte(ctrlReg1_, turnOnIndex);
+    std::array<std::uint8_t, 1> positions{turnOnIndex};
+    ResetValuesInByte(ctrlReg1_, positions);
 }
 
 void PressureSensor::ReadPressure() {
@@ -72,11 +75,16 @@ bool PressureSensor::isProbeAvailable() const {
     std::cout << "measure ready? 000010: " << data << std::endl;
     return data.test(pressureBitIndex);
 }
-template<std::size_t B>
-void PressureSensor::SaveDataFromSensor(const std::bitset<8>& dataFrom,
-                                        std::bitset<B>& dataTo) {
-    for (std::size_t i = 0; i < 8; i++) {
-        dataTo[i] = dataFrom[i];
+template<std::size_t To, std::size_t From>
+void PressureSensor::SaveDataFromSensor(const std::bitset<From>& dataFrom,
+                                        std::bitset<To>& dataTo) {
+    if(From > To){
+        ESP_LOGE(devicePressSens, "Too much data, %d > %d", From, To);
+    }
+    else{
+        for (std::size_t i = 0; i < From; i++) {
+            dataTo[i] = dataFrom[i];
+        }
     }
 }
 esp_err_t PressureSensor::ReadByte(std::uint8_t reg,
@@ -87,18 +95,24 @@ esp_err_t PressureSensor::ReadByte(std::uint8_t reg,
     data = ConvertToBitset(byte);
     return err;
 }
-esp_err_t PressureSensor::SetValueInByte(std::uint8_t reg,
-                                         std::uint8_t position) {
+template <std::size_t B>
+esp_err_t PressureSensor::SetValuesInByte(std::uint8_t reg,
+                                         std::array<std::uint8_t, B> positions) {
     std::bitset<8> valueInRegister;
     ReadByte(reg, valueInRegister);
-    valueInRegister.set(static_cast<int>(position));
+    for (const auto &val : positions){
+        valueInRegister.set(static_cast<int>(val));
+    }
     return WriteByte(reg, valueInRegister);
 }
-esp_err_t PressureSensor::ResetValueInByte(std::uint8_t reg,
-                                           std::uint8_t position) {
+template<std::size_t B>
+esp_err_t PressureSensor::ResetValuesInByte(std::uint8_t reg,
+                                            std::array<std::uint8_t, B> positions) {
     std::bitset<8> valueInRegister;
     ReadByte(reg, valueInRegister);
-    valueInRegister.reset(static_cast<int>(position));
+    for (const auto &val : positions){
+        valueInRegister.reset(static_cast<int>(val));
+    }
     return WriteByte(reg, valueInRegister);
 }
 esp_err_t PressureSensor::WriteByte(std::uint8_t reg, std::bitset<8> data) {

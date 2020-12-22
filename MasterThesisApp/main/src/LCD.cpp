@@ -181,7 +181,7 @@ void LCD::DisplayCO2() {
 
 void LCD::DisplayTemperature() {
     std::string firstLine = "Temperature";
-    std::string secondLine = ConvertNumberToString(temperature_, 2);
+    std::string secondLine = ConvertNumberToString(temperature_, 1);
     DisplayTwoLines(firstLine, secondLine);
 }
 void LCD::DisplayHumidity() {
