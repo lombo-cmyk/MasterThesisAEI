@@ -89,23 +89,6 @@ void LCD::DisplayWelcomeMessage() const {
     }
 }
 
-uint8_t LCD::_wait_for_user(void) {
-    uint8_t c = 0;
-
-#ifdef USE_STDIN
-    while (!c) {
-        STATUS s = uart_rx_one_char(&c);
-        if (s == OK) {
-            printf("%c", c);
-        }
-        vTaskDelay(1);
-    }
-#else
-    vTaskDelay(1000 / portTICK_RATE_MS);
-#endif
-    return c;
-}
-
 void LCD::Setbacklight(const std::uint16_t& displayState) {
     uint64_t tenSeconds = 10000000;
     if (displayState == 0 && intHandler_.GetLcdBacklight()) {

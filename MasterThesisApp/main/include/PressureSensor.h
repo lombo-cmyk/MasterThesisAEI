@@ -58,11 +58,14 @@ private:
     template<std::size_t To, std::size_t From>
     void SaveDataFromSensor(const std::bitset<From>& dataFrom,
                             std::bitset<To>& dataTo);
-    esp_err_t ReadByte(std::uint8_t reg, std::bitset<8>& data) const;
     template<std::size_t B>
-    esp_err_t SetValuesInByte(std::uint8_t reg, std::array<std::uint8_t, B> positions);
+    esp_err_t ReadBytes(std::uint8_t reg, std::bitset<B>& data) const;
     template<std::size_t B>
-    esp_err_t ResetValuesInByte(std::uint8_t reg, std::array<std::uint8_t, B> positions);
+    esp_err_t SetValuesInByte(std::uint8_t reg,
+                              std::array<std::uint8_t, B> positions);
+    template<std::size_t B>
+    esp_err_t ResetValuesInByte(std::uint8_t reg,
+                                std::array<std::uint8_t, B> positions);
     esp_err_t WriteByte(std::uint8_t reg, std::bitset<8> data);
     static std::bitset<8> ConvertToBitset(std::uint8_t byte);
     static std::uint8_t ConvertToUint8(std::bitset<8> byte);
