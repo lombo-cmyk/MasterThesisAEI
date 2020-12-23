@@ -16,9 +16,8 @@ void app_main();
 }
 
 void app_main(void) {
-    vTaskDelay(SECOND/10);
-    double PM25 = 0, PM10 = 0, CO = 0, CO2 = 0, temperature = 0,
-        humidity = 0;
+    vTaskDelay(SECOND / 10);
+    double PM25 = 0, PM10 = 0, CO = 0, CO2 = 0, temperature = 0, humidity = 0;
     unsigned int pressure = 0;
     auto& intHandler = InterruptHandler::getInstance();
     intHandler.InitializeInterrupts();
@@ -32,9 +31,15 @@ void app_main(void) {
         pressureSensor.EnableOneMeasure();
         pressure = pressureSensor.GetPressure();
         temperature = pressureSensor.GetTemperature();
-        Lcd.GetCurrentMeasurements(PM25, PM10, CO, CO2, temperature, humidity, pressure);
+        Lcd.GetCurrentMeasurements(ps.GetPM25(),
+                                   ps.GetPM10(),
+                                   CO,
+                                   CO2,
+                                   pressureSensor.GetTemperature(),
+                                   humidity,
+                                   pressureSensor.GetPressure());
         Lcd.DisplayCurrentState();
         ps.PerformReadOut();
-        vTaskDelay(SECOND/10);
+        vTaskDelay(SECOND / 10);
     }
 }
