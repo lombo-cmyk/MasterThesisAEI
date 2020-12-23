@@ -7,6 +7,7 @@
 #include "include/InterruptHandler.h"
 #include "include//I2CWrapper.h"
 #include "include/PressureSensor.h"
+#include "include/ParticlesSensor.h"
 #include <iostream>
 #include "esp_log.h"
 
@@ -25,6 +26,7 @@ void app_main(void) {
     I2cWrapper.ConfigureCommunication();
     LCD Lcd = LCD();
     PressureSensor pressureSensor = PressureSensor();
+    ParticlesSensor ps = ParticlesSensor();
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
@@ -32,5 +34,7 @@ void app_main(void) {
         temperature = pressureSensor.GetTemperature();
         Lcd.GetCurrentMeasurements(PM25, PM10, CO, CO2, temperature, humidity, pressure);
         Lcd.DisplayCurrentState();
+        ps.PerformReadOut();
+        vTaskDelay(SECOND/10);
     }
 }
