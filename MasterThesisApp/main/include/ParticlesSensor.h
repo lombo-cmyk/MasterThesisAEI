@@ -7,6 +7,7 @@
 #include "smbus.h"
 #include <bitset>
 #include <array>
+#include <memory>
 class ParticlesSensor {
 public:
     ParticlesSensor();
@@ -29,14 +30,15 @@ private:
     bool isParticleDataAvailable();
     void StartMeasuring(bool measureFloat);
     void StopMeasuring();
-    void SetPointerAndRead(const std::uint16_t ptrAddress,
-                           std::uint8_t* data,
-                           std::size_t len);
+    template<std::size_t B>
+    void SetPointerAndRead(std::uint16_t ptrAddress,
+                           std::array<std::uint8_t, B>& data);
+    template<std::size_t B>
     void SetPointerAndWrite(const std::uint16_t ptrAddress,
-                            uint8_t* data,
-                            uint8_t len);
+                            std::array<uint8_t, B>& data);
     void SetPointer(std::uint16_t ptrAddress);
-    void ReadData(std::uint8_t* data, std::size_t len);
+    template<std::size_t B>
+    void ReadData(std::array<std::uint8_t, B>& data);
     std::uint8_t CalculateCrc(std::uint8_t data_0, std::uint8_t data_1);
 };
 
