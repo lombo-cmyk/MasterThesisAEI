@@ -3,7 +3,6 @@
 //
 
 #include "include/LCD.h"
-#include "sdkconfig.h"
 #include "include/Definitions.h"
 #include "string"
 #include "include/I2CWrapper.h"
