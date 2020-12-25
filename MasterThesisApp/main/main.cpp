@@ -27,11 +27,10 @@ void app_main(void) {
     LCD Lcd = LCD();
     PressureSensor pressureSensor = PressureSensor();
     ParticlesSensor ps = ParticlesSensor();
+    ps.StartMeasuring(false);
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
-        pressure = pressureSensor.GetPressure();
-        temperature = pressureSensor.GetTemperature();
         Lcd.GetCurrentMeasurements(ps.GetPM25(),
                                    ps.GetPM10(),
                                    CO,

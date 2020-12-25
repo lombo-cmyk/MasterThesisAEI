@@ -6,6 +6,12 @@
 #ifndef AIRCONTROLLER_PINS_H
 #define AIRCONTROLLER_PINS_H
 
+#define WRITE_BIT I2C_MASTER_WRITE
+#define READ_BIT I2C_MASTER_READ
+#define ACK_CHECK true
+#define ACK_VALUE 0x0
+#define NACK_VALUE 0x1
+
 #define DO_NOT_USE GPIO_NUM_5 // well, this one is broken, 5V too strong
 #define FORWARD_BUTTON GPIO_NUM_18
 #define BUTTON_2 GPIO_NUM_19
