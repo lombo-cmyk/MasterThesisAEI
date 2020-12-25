@@ -4,9 +4,9 @@
 
 #include "include/ParticlesSensor.h"
 #include "include/I2CWrapper.h"
-#include "driver/i2c.h"
 #include <iostream>
 #include "include/Definitions.h"
+#include "esp_log.h"
 #include "bitset"
 #include <memory>
 #define WRITE_BIT I2C_MASTER_WRITE
@@ -15,50 +15,65 @@
 #define NO_ACK_CHECK false
 #define ACK_VALUE 0x0
 #define NACK_VALUE 0x1
+
 ParticlesSensor::ParticlesSensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
     ParticlesCommunicationInfo_ = i2cWrapper.GetsmBusInfoPm();
     StartMeasuring(false);
 }
-std::uint8_t ParticlesSensor::CalculateCrc(std::uint8_t data_0,
-                                           std::uint8_t data_1) {
-    std::uint8_t data[2] = {data_0, data_1};
-    uint8_t crc = 0xFF;
+std::uint8_t ParticlesSensor::CalculateCrc(std::uint8_t dataLSB,
+                                           std::uint8_t dataMSB) {
+    /// Datasheet Sensirion SPS30
+    /// articulate Matter Sensor for Air Quality Monitoring and Control
+    std::array<std::uint8_t, 2> data = {dataLSB, dataMSB};
+    uint8_t crc = 0xFFu;
     for (int i = 0; i < 2; i++) {
         crc ^= data[i];
         for (uint8_t bit = 8; bit > 0; --bit) {
-            if (crc & 0x80) {
-                crc = (crc << 1) ^ 0x31u;
+            if (crc & 0x80u) {
+                crc = (crc << 1u) ^ 0x31u; // NOLINT Wrong type assumed
             } else {
-                crc = (crc << 1);
+                crc = (crc << 1u);
             }
         }
     }
     return crc;
 }
-void ParticlesSensor::PerformReadOut() {
+void ParticlesSensor::PerformReadout() {
     std::array<std::uint8_t, 30> data{};
     if (isParticleDataAvailable()) {
         SetPointerAndRead(readMeasureDataPtr_, data);
-    }
-    for (std::size_t i = 0; i < 30; i += 3) {
-        std::size_t crc = CalculateCrc(data[i], data[i + 1]);
-        if (crc == data[i + 2]) {
-            std::uint16_t measure = (data[i] << 8) + data[i + 1];
-            std::cout << "Measure: " << static_cast<int>(measure) << std::endl;
-            if (i == 3) {
-                PM25 = static_cast<double>(measure);
-            }
-            if (i == 9) {
-                PM10 = static_cast<double>(measure);
-            }
-        } else {
-            std::cout << "CRC FAIL" << std::endl;
+        if (IsCrcInDataValid(data)) {
+            ConvertReadData(data);
         }
     }
 }
+template<std::size_t B>
+bool ParticlesSensor::IsCrcInDataValid(
+    const std::array<std::uint8_t, B>& data) const {
+    bool valid = true;
+    for (std::size_t i = 0; i < data.size(); i += 3) {
+        std::size_t crc = CalculateCrc(data[i], data[i + 1]);
+        if (crc != data[i + 2]) {
+            ESP_LOGE(devicePmSens,
+                     "CRC fail in dataread, data: %02x, calculated: %02x",
+                     data[i + 2],
+                     crc);
+            ESP_LOGE(devicePmSens, "Data corrupted, breaking");
+            valid = false;
+            break;
+        }
+    }
+    return valid;
+}
+template<std::size_t B>
+void ParticlesSensor::ConvertReadData(
+    const std::array<std::uint8_t, B>& data) {
+    // todo: enable calculating flot basing on data.size() or outputFormatByte
+    PM25 = static_cast<std::uint16_t>((data[3] << 8u) + data[4]);
+    PM10 = static_cast<std::uint16_t>((data[9] << 8u) + data[10]);
+}
 void ParticlesSensor::StartMeasuring(bool measureFloat) {
-    std::uint8_t outputFormatByte;
     if (measureFloat) {
         outputFormatByte = 0x03;
     } else {
@@ -67,23 +82,28 @@ void ParticlesSensor::StartMeasuring(bool measureFloat) {
     std::array<std::uint8_t, 2> data{outputFormatByte, 0x00};
     SetPointerAndWrite(measureStartPtr_, data);
 }
-void ParticlesSensor::StopMeasuring() {}
+void ParticlesSensor::StopMeasuring() const {
+    SetPointer(measureStopPtr_);
+}
 template<std::size_t B>
-void ParticlesSensor::SetPointerAndRead(const std::uint16_t ptrAddress,
-                                        std::array<std::uint8_t, B>& data) {
+void ParticlesSensor::SetPointerAndRead(
+    const std::uint16_t ptrAddress,
+    std::array<std::uint8_t, B>& data) const {
     SetPointer(ptrAddress);
     ReadData(data);
 }
 template<std::size_t B>
-void ParticlesSensor::SetPointerAndWrite(const std::uint16_t ptrAddress,
-                                         std::array<std::uint8_t, B>& data) {
+void ParticlesSensor::SetPointerAndWrite(
+    const std::uint16_t ptrAddress,
+    std::array<std::uint8_t, B>& data) const {
     esp_err_t error;
-    uint8_t ptrAd[2] = {static_cast<uint8_t>(ptrAddress & 0xffu),
-                        static_cast<uint8_t>((ptrAddress >> 8u) & 0xffu)};
+    std::array<std::uint8_t, 2> ptrAd = {
+        static_cast<uint8_t>(ptrAddress & 0xFFu),
+        static_cast<uint8_t>((ptrAddress >> 8u) & 0xFFu)}; // NOLINT
     i2c_cmd_handle_t commandHandle = i2c_cmd_link_create();
     i2c_master_start(commandHandle);
     i2c_master_write_byte(commandHandle,
-                          ParticlesCommunicationInfo_->address << 1 |
+                          ParticlesCommunicationInfo_->address << 1 | // NOLINT
                               WRITE_BIT,
                           ACK_CHECK);
     i2c_master_write_byte(commandHandle, ptrAd[1], ACK_CHECK);
@@ -102,14 +122,15 @@ void ParticlesSensor::SetPointerAndWrite(const std::uint16_t ptrAddress,
     std::cout << "Error set write: " << error << std::endl;
     i2c_cmd_link_delete(commandHandle);
 }
-void ParticlesSensor::SetPointer(const std::uint16_t ptrAddress) {
+void ParticlesSensor::SetPointer(const std::uint16_t ptrAddress) const {
     esp_err_t error;
-    uint8_t ptrAd[2] = {static_cast<uint8_t>(ptrAddress & 0xffu),
-                        static_cast<uint8_t>((ptrAddress >> 8u) & 0xffu)};
+    std::array<std::uint8_t, 2> ptrAd = {
+        static_cast<uint8_t>(ptrAddress & 0xFFu),
+        static_cast<uint8_t>((ptrAddress >> 8u) & 0xFFu)}; // NOLINT
     i2c_cmd_handle_t commandHandle = i2c_cmd_link_create();
     i2c_master_start(commandHandle);
     i2c_master_write_byte(commandHandle,
-                          ParticlesCommunicationInfo_->address << 1 |
+                          ParticlesCommunicationInfo_->address << 1 | // NOLINT
                               WRITE_BIT,
                           ACK_CHECK);
     i2c_master_write_byte(commandHandle, ptrAd[1], ACK_CHECK);
@@ -122,12 +143,12 @@ void ParticlesSensor::SetPointer(const std::uint16_t ptrAddress) {
     i2c_cmd_link_delete(commandHandle);
 }
 template<std::size_t B>
-void ParticlesSensor::ReadData(std::array<std::uint8_t, B>& data) {
+void ParticlesSensor::ReadData(std::array<std::uint8_t, B>& data) const {
     esp_err_t err;
     i2c_cmd_handle_t commandHandle = i2c_cmd_link_create();
     i2c_master_start(commandHandle);
     i2c_master_write_byte(commandHandle,
-                          ParticlesCommunicationInfo_->address << 1 | READ_BIT,
+                          ParticlesCommunicationInfo_->address << 1 | READ_BIT, // NOLINT
                           ACK_CHECK);
     i2c_master_read(commandHandle,
                     data.data(),
@@ -140,9 +161,8 @@ void ParticlesSensor::ReadData(std::array<std::uint8_t, B>& data) {
     std::cout << "Error_1: " << err << std::endl;
     i2c_cmd_link_delete(commandHandle);
 }
-bool ParticlesSensor::isParticleDataAvailable() {
+bool ParticlesSensor::isParticleDataAvailable() const {
     std::array<std::uint8_t, 3> data{};
-
     SetPointerAndRead(DataReadyFlagPtr_, data);
     return static_cast<bool>(data[1]);
 }

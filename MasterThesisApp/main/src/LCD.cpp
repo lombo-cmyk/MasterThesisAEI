@@ -25,8 +25,8 @@ LCD::LCD() {
     i2c_lcd1602_set_backlight(LcdInfo_, isBacklight_);
     DisplayWelcomeMessage();
 }
-void LCD::GetCurrentMeasurements(double pm25,
-                                 double pm10,
+void LCD::GetCurrentMeasurements(std::uint16_t pm25,
+                                 std::uint16_t pm10,
                                  double co,
                                  double co2,
                                  double t,

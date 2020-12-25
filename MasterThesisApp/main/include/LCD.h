@@ -16,8 +16,8 @@ public:
     LCD();
     static void AdjustLine(std::string& line);
     void DisplayCurrentState();
-    void GetCurrentMeasurements(double pm25,
-                                double pm10,
+    void GetCurrentMeasurements(std::uint16_t pm25,
+                                std::uint16_t pm10,
                                 double co,
                                 double co2,
                                 double t,
@@ -29,8 +29,9 @@ private:
     bool isBacklight_ = true;
     std::uint64_t backlightTimer_ = esp_timer_get_time();
     InterruptHandler& intHandler_ = InterruptHandler::getInstance();
-    double PM25_ = 0, PM10_ = 0, CO_ = 0, CO2_ = 0, temperature_ = 0,
+    double CO_ = 0, CO2_ = 0, temperature_ = 0,
            humidity_ = 0;
+    std::uint16_t PM25_ = 0, PM10_ = 0;
     unsigned int pressure_ = 0;
 
     template<typename T>
@@ -47,7 +48,6 @@ private:
     void DisplayPressure();
 
     void Setbacklight(const std::uint16_t& displayState);
-    static uint8_t _wait_for_user(void);
 };
 
 #endif // APP_TEMPLATE_LCD_H

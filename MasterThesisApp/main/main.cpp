@@ -17,7 +17,8 @@ void app_main();
 
 void app_main(void) {
     vTaskDelay(SECOND / 10);
-    double PM25 = 0, PM10 = 0, CO = 0, CO2 = 0, temperature = 0, humidity = 0;
+    double CO = 0, CO2 = 0, temperature = 0, humidity = 0;
+    std::uint16_t PM25 = 0, PM10 = 0;
     unsigned int pressure = 0;
     auto& intHandler = InterruptHandler::getInstance();
     intHandler.InitializeInterrupts();
@@ -39,7 +40,7 @@ void app_main(void) {
                                    humidity,
                                    pressureSensor.GetPressure());
         Lcd.DisplayCurrentState();
-        ps.PerformReadOut();
+        ps.PerformReadout();
         vTaskDelay(SECOND / 10);
     }
 }
