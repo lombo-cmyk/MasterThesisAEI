@@ -28,8 +28,8 @@ void PressureSensor::EnableOneMeasure() {
 void PressureSensor::PerformReadOut() {
     if (isProbeAvailable()) {
         ReadPressure();
-        ESP_LOGI(devicePressSens, "Pressure is: %du", pressureData_);
         ReadTemperature();
+        ESP_LOGI(devicePressSens, "Pressure is: %du", pressureData_);
         ESP_LOGI(devicePressSens, "Temp is: %f", tempData_);
     }
 }
@@ -49,27 +49,36 @@ void PressureSensor::TurnDeviceOff() {
     ResetValuesInByte(ctrlReg1_, positions);
 }
 
-void PressureSensor::ReadPressure() {
+esp_err_t PressureSensor::ReadPressure() {
+    esp_err_t error;
     const std::size_t pressureBytes = 3;
     std::bitset<8 * pressureBytes> data;
-    ReadBytes(pressureLowReg_, data);
+    error = ReadBytes(pressureLowReg_, data);
     SaveDataFromSensor(data, rawPressureData_);
     pressureData_ = rawPressureData_.to_ulong() / 4096;
+    return error;
 }
 
-void PressureSensor::ReadTemperature() {
+esp_err_t PressureSensor::ReadTemperature() {
+    esp_err_t error;
     const std::size_t temperatureBytes = 2;
     std::bitset<8 * temperatureBytes> data;
-    ReadBytes(tempLowReg_, data);
+    error = ReadBytes(tempLowReg_, data);
     SaveDataFromSensor(data, rawTempData_);
     tempData_ = 42.5 + ConvertToLong(rawTempData_) / 480.0;
+    return error;
 }
 
 bool PressureSensor::isProbeAvailable() const {
-    std::bitset<8> data;
+    bool isProbe=false;
+    esp_err_t error;
+    std::bitset<8> data{};
     std::size_t pressureBitIndex = 1;
-    ReadBytes(statusReg_, data);
-    return data.test(pressureBitIndex);
+    error = ReadBytes(statusReg_, data);
+    if (error == ESP_OK){
+        isProbe = static_cast<bool>(data[pressureBitIndex]);
+    }
+    return isProbe;
 }
 
 template<std::size_t To, std::size_t From>
@@ -88,16 +97,18 @@ template<std::size_t B>
 esp_err_t PressureSensor::ReadBytes(std::uint8_t reg,
                                     std::bitset<B>& data) const {
     esp_err_t err;
-    std::size_t noBytes = B / 8;
-    std::uint8_t byte[noBytes];
+    const std::size_t noBytes = B / 8;
+    std::array<std::uint8_t, noBytes> bytes{};
     if (noBytes > 1) {
         reg |= 0b10000000u;
     }
-    err = smbus_i2c_read_block(PressureCommunicationInfo_, reg, byte, noBytes);
-    for (std::size_t i = noBytes - 1; i > 0; i--) {
-        data |= byte[i] << (8 * i);
+    err = smbus_i2c_read_block(PressureCommunicationInfo_, reg,
+                               bytes.data(),
+                               bytes.size());
+    for (std::size_t i = bytes.size() - 1; i > 0; i--) {
+        data |= bytes[i] << (8 * i);
     }
-    data |= byte[0];
+    data |= bytes[0];
     return err;
 }
 

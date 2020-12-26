@@ -51,8 +51,8 @@ private:
     double tempData_ = 0;
     void TurnDeviceOn();
     void TurnDeviceOff();
-    void ReadPressure();
-    void ReadTemperature();
+    esp_err_t ReadPressure();
+    esp_err_t ReadTemperature();
     bool isProbeAvailable() const;
 
     template<std::size_t To, std::size_t From>
