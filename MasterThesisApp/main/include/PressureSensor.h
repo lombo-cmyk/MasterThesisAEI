@@ -10,26 +10,29 @@
 #include <cstdint>
 #include "I2CWrapper.h"
 #include "smbus.h"
+#include "I2Ccommon.h"
 
-class PressureSensor {
+class PressureSensor: private I2Ccommon {
 public:
     PressureSensor();
-    void EnableOneMeasure();
-    void PerformReadOut();
+    bool TurnDeviceOn();
+    bool TurnDeviceOff();
+    bool EnableOneMeasure();
+    bool PerformReadOut();
     auto GetRawPressure() const -> const std::bitset<24>& {
         return rawPressureData_;
     }
+
     auto GetPressure() const -> const unsigned int& {
         return pressureData_;
     }
+
     auto GetRawTemperature() const -> const std::bitset<16>& {
         return rawTempData_;
     }
-
     auto GetTemperature() const -> const double& {
         return tempData_;
     }
-
 private:
     static constexpr std::uint_fast8_t whoIAmReg_{0x0F};
     static constexpr std::uint8_t ctrlReg1_{0x20};
@@ -39,21 +42,19 @@ private:
     static constexpr std::uint8_t pressureMidReg_{0x29};
     static constexpr std::uint8_t pressureHighReg_{0x2A};
     static constexpr std::uint8_t tempLowReg_{0x2B};
+
     static constexpr std::uint8_t tempHighReg_{0x2C};
     static constexpr std::uint8_t oneMeasureIndex = 0;
-
     static constexpr std::uint8_t turnOnIndex = 7;
     smbus_info_t* PressureCommunicationInfo_ = new smbus_info_t;
     std::bitset<24> rawPressureData_;
+
     unsigned int pressureData_ = 0;
     std::bitset<16> rawTempData_;
-
     double tempData_ = 0;
-    void TurnDeviceOn();
-    void TurnDeviceOff();
     esp_err_t ReadPressure();
     esp_err_t ReadTemperature();
-    bool isProbeAvailable() const;
+    bool isProbeAvailable();
 
     template<std::size_t To, std::size_t From>
     void SaveDataFromSensor(const std::bitset<From>& dataFrom,

@@ -9,8 +9,9 @@
 #include <array>
 #include <memory>
 #include <tuple>
+#include "I2Ccommon.h"
 
-class ParticlesSensor {
+class ParticlesSensor: private I2Ccommon{
 public:
     ParticlesSensor();
     void StartMeasuring(bool measureFloat);
@@ -22,12 +23,6 @@ public:
     }
     auto GetPM10() const -> const std::uint16_t &{
         return PM10;
-    }
-    auto GetCurrentError() const -> const esp_err_t &{
-        return currentError_;
-    }
-    auto GetPreviousRealError() const -> const esp_err_t &{
-        return previousRealError_;
     }
 private:
     smbus_info_t* ParticlesCommunicationInfo_;
@@ -54,7 +49,6 @@ private:
     static std::uint8_t CalculateCrc(std::uint8_t data_0, std::uint8_t data_1);
     template<std::size_t B>
     bool IsCrcInDataValid(const std::array<std::uint8_t, B> &data) const;
-    bool IsErrorInCommunication(esp_err_t error) ;
 
 };
 
