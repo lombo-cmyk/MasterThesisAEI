@@ -40,6 +40,13 @@ void I2CWrapper::ConfigurePmSensorBusInfo() {
     smBusInfoPm_ = smbus_info;
 }
 
+void I2CWrapper::ConfigureCo2SensorBusInfo() {
+    auto smbus_info = new smbus_info_t;
+    smbus_init(smbus_info, i2cInterface_, CO2SensorAddress_);
+    smbus_set_timeout(smbus_info, 10000 / portTICK_RATE_MS);
+    smBusInfoCo2 = smbus_info;
+}
+
 bool I2CWrapper::isInit(const smbus_info_t* busInfo, const char* deviceName) {
     bool ok = false;
     if (busInfo != nullptr) {
@@ -54,18 +61,24 @@ bool I2CWrapper::isInit(const smbus_info_t* busInfo, const char* deviceName) {
     ESP_LOGI(deviceName, "Bus configured properly");
     return ok;
 }
-
 void I2CWrapper::ConfigureCommunication() {
     I2CWrapper::ConfigureConnectionDetails();
+
     I2CWrapper::ConfigureDisplayBusInfo();
     I2CWrapper::isInit(smBusInfoDisplay_, deviceLCD);
     I2CWrapper::pingDevice(smBusInfoDisplay_, deviceLCD);
+
     I2CWrapper::ConfigurePressureSensorBusInfo();
     I2CWrapper::isInit(smBusInfoPressureSensor_, devicePressSens);
     I2CWrapper::pingDevice(smBusInfoPressureSensor_, devicePressSens);
+
     I2CWrapper::ConfigurePmSensorBusInfo();
     I2CWrapper::isInit(smBusInfoPm_, devicePmSens);
     I2CWrapper::pingDevice(smBusInfoPm_, devicePmSens);
+
+    I2CWrapper::ConfigureCo2SensorBusInfo();
+    I2CWrapper::isInit(smBusInfoCo2, deviceCo2Sens);
+    I2CWrapper::pingDevice(smBusInfoCo2, deviceCo2Sens);
 }
 void I2CWrapper::pingDevice(smbus_info_t* busInfo, const char* device) {
     esp_err_t error = smbus_quick(busInfo, I2C_MASTER_WRITE);

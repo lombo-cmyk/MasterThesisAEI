@@ -28,4 +28,5 @@
 constexpr char deviceLCD[] = "LCD";
 constexpr char devicePressSens[] = "PressureSensor";
 constexpr char devicePmSens[] = "ParticlesSensor";
+constexpr char deviceCo2Sens[] = "Co2_Sensor";
 #endif // AIRCONTROLLER_PINS_H
