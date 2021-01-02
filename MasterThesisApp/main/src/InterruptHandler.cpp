@@ -18,8 +18,7 @@ void InterruptHandler::DisplayNextState(void* arg) {
 
 void InterruptHandler::InitializeInterrupts() {
     gpio_set_direction(FORWARD_BUTTON, GPIO_MODE_INPUT);
-    gpio_set_direction(FORWARD_BUTTON, GPIO_MODE_INPUT);
-    gpio_set_direction(BUTTON_2, GPIO_MODE_INPUT);
+    gpio_set_direction(CO2_BUSY_BUTTON, GPIO_MODE_INPUT);
     gpio_set_intr_type(FORWARD_BUTTON, GPIO_INTR_POSEDGE);
     gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
     gpio_isr_handler_add(FORWARD_BUTTON, DisplayNextState, nullptr);
