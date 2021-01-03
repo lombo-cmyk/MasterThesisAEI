@@ -7,6 +7,7 @@
 #include "smbus.h"
 #include "include/Definitions.h"
 #include "esp_log.h"
+#include "include/Converter.h"
 
 PressureSensor::PressureSensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
@@ -154,21 +155,4 @@ esp_err_t PressureSensor::WriteByte(const std::uint8_t reg,
                                     const std::bitset<8> data) {
     std::uint8_t d = ConvertToUint8(data);
     return smbus_i2c_write_block(PressureCommunicationInfo_, reg, &d, 1);
-}
-
-std::bitset<8> PressureSensor::ConvertToBitset(std::uint8_t byte) {
-    return static_cast<std::bitset<8>>(byte);
-}
-
-std::uint8_t PressureSensor::ConvertToUint8(std::bitset<8> byte) {
-    return static_cast<uint8_t>(byte.to_ulong());
-}
-
-template<std::size_t B>
-long PressureSensor::ConvertToLong(const std::bitset<B>& b) {
-    //© 1997-2005 Bit Twiddling Hacks Sean Eron Anderson
-    struct {
-        long x : B;
-    } s;
-    return s.x = b.to_ulong();
 }

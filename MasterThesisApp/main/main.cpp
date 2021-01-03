@@ -14,9 +14,7 @@ void app_main();
 
 void app_main(void) {
 //    vTaskDelay(SECOND / 10);
-    double CO = 0, CO2 = 0, temperature = 0, humidity = 0;
-    std::uint16_t PM25 = 0, PM10 = 0;
-    unsigned int pressure = 0;
+    double CO = 0, humidity = 0;
     auto& intHandler = InterruptHandler::getInstance();
     intHandler.InitializeInterrupts();
     auto& I2cWrapper = I2CWrapper::getInstance();

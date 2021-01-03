@@ -27,10 +27,6 @@ private:
     std::uint16_t Co2Value_ = 0;
     bool IsDeviceOn();
     bool IsSensorBusy();
-    std::bitset<8> ConvertToBitset(std::uint8_t byte);
-    std::uint8_t ConvertToUint8(std::bitset<8> byte);
-    template<std::size_t B>
-    long ConvertToLong(const std::bitset<B>& b);
     static constexpr std::uint8_t operatingModePtr_ = 0x01;
     static constexpr std::uint8_t readStatusPtr_ = 0x02;
     static constexpr std::uint8_t lowCo2DataPtr_ = 0x03;
