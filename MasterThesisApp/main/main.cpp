@@ -24,15 +24,16 @@ void app_main(void) {
     ParticlesSensor ps = ParticlesSensor();
     ps.StartMeasuring(false);
     Co2Sensor Co2 = Co2Sensor();
-    bool iserror = Co2.StartMeasuring();
-    ESP_LOGI(deviceCo2Sens, "Iserror in co2 on: %d", iserror);
+    Co2.StartMeasuring();
+//    ESP_LOGI(deviceCo2Sens, "Iserror in co2 on: %d", iserror);
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
         Lcd.GetCurrentMeasurements(ps.GetPM25(),
                                    ps.GetPM10(),
                                    CO,
-                                   Co2.GetCo2Value(),
+//                                   Co2.GetCo2Value(),
+                                   123,
                                    pressureSensor.GetTemperature(),
                                    humidity,
                                    pressureSensor.GetPressure());

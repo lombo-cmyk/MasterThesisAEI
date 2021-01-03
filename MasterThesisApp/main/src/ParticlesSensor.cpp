@@ -20,10 +20,11 @@ void ParticlesSensor::StartMeasuring(bool measureFloat) {
         outputFormatByte = 0x05;
     }
     std::array<std::uint8_t, 2> data{outputFormatByte, 0x00};
-    IsErrorInCommunication(SetPointerAndWrite(measureStartPtr_, data));
+    IsErrorInCommunication(SetPointerAndWrite(measureStartPtr_, data),
+                           devicePmSens);
 }
 void ParticlesSensor::StopMeasuring() {
-    IsErrorInCommunication(SetPointer(measureStopPtr_));
+    IsErrorInCommunication(SetPointer(measureStopPtr_), devicePmSens);
 }
 bool ParticlesSensor::PerformReadout() {
     std::array<std::uint8_t, 30> data{};
@@ -31,8 +32,8 @@ bool ParticlesSensor::PerformReadout() {
     bool isNewData = false;
     if (IsParticleDataAvailable()) {
         error = SetPointerAndRead(readMeasureDataPtr_, data);
-        if (!IsErrorInCommunication(std::get<0>(error)) &&
-            !IsErrorInCommunication(std::get<1>(error)) &&
+        if (!IsErrorInCommunication(std::get<0>(error), devicePmSens) &&
+            !IsErrorInCommunication(std::get<1>(error), devicePmSens) &&
             IsCrcInDataValid(data)) {
             ConvertReadData(data);
             isNewData = true;
@@ -45,8 +46,8 @@ bool ParticlesSensor::IsParticleDataAvailable() {
     std::array<std::uint8_t, 3> data{};
     std::pair<esp_err_t, esp_err_t> error;
     error = SetPointerAndRead(DataReadyFlagPtr_, data);
-    if (!IsErrorInCommunication(std::get<0>(error)) &&
-        !IsErrorInCommunication(std::get<1>(error))) {
+    if (!IsErrorInCommunication(std::get<0>(error), devicePmSens) &&
+        !IsErrorInCommunication(std::get<1>(error), devicePmSens)) {
         isData = static_cast<bool>(data[1]);
     }
     return isData;

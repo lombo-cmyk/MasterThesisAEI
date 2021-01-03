@@ -2,7 +2,7 @@
 // Created by lukaszk on 08.07.2020.
 //
 #include "driver/gpio.h"
-
+#include <string>
 #ifndef AIRCONTROLLER_PINS_H
 #define AIRCONTROLLER_PINS_H
 
@@ -21,6 +21,8 @@
 #define DEBOUNCE_TIME 10 // 70 needed w/o proper HW debouncing
 #define LCD_COLUMNS 16
 #define SECOND 1000
+
+#define ESP_DEVICE_BUSY 0x111
 
 constexpr char deviceLCD[] = "LCD";
 constexpr char devicePressSens[] = "PressureSensor";

@@ -18,7 +18,8 @@ PressureSensor::PressureSensor() {
 
 bool PressureSensor::EnableOneMeasure() {
     std::array<std::uint8_t, 1> positions{oneMeasureIndex};
-    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg2_, positions));
+    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg2_, positions),
+                                      devicePressSens);
     // todo: move below to public IsOneMeasureEnabled();
     std::bitset<8> byte;
     ReadBytes(ctrlReg2_, byte);
@@ -33,8 +34,8 @@ bool PressureSensor::PerformReadOut() {
     if (isProbeAvailable()) {
         esp_err_t errorPressure = ReadPressure();
         esp_err_t errorTemp = ReadTemperature();
-        ret = !(IsErrorInCommunication(errorPressure) ||
-                IsErrorInCommunication(errorTemp));
+        ret = !(IsErrorInCommunication(errorPressure, devicePressSens) ||
+                IsErrorInCommunication(errorTemp, devicePressSens));
         ESP_LOGI(devicePressSens, "Pressure is: %du", pressureData_);
         ESP_LOGI(devicePressSens, "Temp is: %f", tempData_);
     }
@@ -43,7 +44,8 @@ bool PressureSensor::PerformReadOut() {
 
 bool PressureSensor::TurnDeviceOn() {
     std::array<std::uint8_t, 1> positions{turnOnIndex};
-    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg1_, positions));
+    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg1_, positions),
+                                      devicePressSens);
     // todo: move below to public IsDeviceOn();
     std::bitset<8> byte;
     ReadBytes(ctrlReg1_, byte);
@@ -56,7 +58,8 @@ bool PressureSensor::TurnDeviceOn() {
 bool PressureSensor::TurnDeviceOff() {
     // todo: implement public IsDeviceOff();
     std::array<std::uint8_t, 1> positions{turnOnIndex};
-    return IsErrorInCommunication(ResetValuesInByte(ctrlReg1_, positions));
+    return IsErrorInCommunication(ResetValuesInByte(ctrlReg1_, positions),
+                                  devicePressSens);
 }
 
 esp_err_t PressureSensor::ReadPressure() {
@@ -89,7 +92,7 @@ bool PressureSensor::isProbeAvailable() {
     std::bitset<8> data{};
     std::size_t pressureBitIndex = 1;
     error = ReadBytes(statusReg_, data);
-    if (!IsErrorInCommunication(error)) {
+    if (!IsErrorInCommunication(error, devicePressSens)) {
         isProbe = static_cast<bool>(data[pressureBitIndex]);
     }
     return isProbe;

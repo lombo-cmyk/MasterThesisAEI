@@ -21,7 +21,7 @@ protected:
     esp_err_t currentError_ = 0;
     esp_err_t previousRealError_ = 0;
 
-    bool IsErrorInCommunication(esp_err_t error);
+    bool IsErrorInCommunication(esp_err_t error, const char device[]);
 };
 
 #endif // MASTERTHESISAPP_I2CCOMMON_H
