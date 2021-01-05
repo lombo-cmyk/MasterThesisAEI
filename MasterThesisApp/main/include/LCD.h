@@ -19,7 +19,7 @@ public:
     void GetCurrentMeasurements(std::uint16_t pm25,
                                 std::uint16_t pm10,
                                 double co,
-                                double co2,
+                                std::uint16_t co2,
                                 double t,
                                 double h,
                                 unsigned int p);
@@ -29,9 +29,9 @@ private:
     bool isBacklight_ = true;
     std::uint64_t backlightTimer_ = esp_timer_get_time();
     InterruptHandler& intHandler_ = InterruptHandler::getInstance();
-    double CO_ = 0, CO2_ = 0, temperature_ = 0,
+    double CO_ = 0, temperature_ = 0,
            humidity_ = 0;
-    std::uint16_t PM25_ = 0, PM10_ = 0;
+    std::uint16_t PM25_ = 0, PM10_ = 0, CO2_ = 0 ;
     unsigned int pressure_ = 0;
 
     template<typename T>

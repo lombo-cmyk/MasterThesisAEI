@@ -34,16 +34,16 @@ public:
         return tempData_;
     }
 private:
-    static constexpr std::uint_fast8_t whoIAmReg_{0x0F};
-    static constexpr std::uint8_t ctrlReg1_{0x20};
-    static constexpr std::uint8_t ctrlReg2_{0x21};
-    static constexpr std::uint8_t statusReg_{0x27};
-    static constexpr std::uint8_t pressureLowReg_{0x28};
-    static constexpr std::uint8_t pressureMidReg_{0x29};
-    static constexpr std::uint8_t pressureHighReg_{0x2A};
-    static constexpr std::uint8_t tempLowReg_{0x2B};
+    static constexpr std::uint_fast8_t whoIAmReg_ = 0x0F;
+    static constexpr std::uint8_t ctrlReg1_ = 0x20;
+    static constexpr std::uint8_t ctrlReg2_ = 0x21;
+    static constexpr std::uint8_t statusReg_ = 0x27;
+    static constexpr std::uint8_t pressureLowReg_ = 0x28;
+    static constexpr std::uint8_t pressureMidReg_ = 0x29;
+    static constexpr std::uint8_t pressureHighReg_ = 0x2A;
+    static constexpr std::uint8_t tempLowReg_ = 0x2B;
 
-    static constexpr std::uint8_t tempHighReg_{0x2C};
+    static constexpr std::uint8_t tempHighReg_ = 0x2C;
     static constexpr std::uint8_t oneMeasureIndex = 0;
     static constexpr std::uint8_t turnOnIndex = 7;
     smbus_info_t* PressureCommunicationInfo_ = new smbus_info_t;
@@ -68,10 +68,6 @@ private:
     esp_err_t ResetValuesInByte(std::uint8_t reg,
                                 std::array<std::uint8_t, B> positions);
     esp_err_t WriteByte(std::uint8_t reg, std::bitset<8> data);
-    static std::bitset<8> ConvertToBitset(std::uint8_t byte);
-    static std::uint8_t ConvertToUint8(std::bitset<8> byte);
-    template<std::size_t B>
-    static long ConvertToLong(const std::bitset<B>& b);
 };
 
 #endif // MASTERTHESISAPP_PRESSURESENSOR_H

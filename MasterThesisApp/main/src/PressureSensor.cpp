@@ -7,6 +7,7 @@
 #include "smbus.h"
 #include "include/Definitions.h"
 #include "esp_log.h"
+#include "include/Converter.h"
 
 PressureSensor::PressureSensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
@@ -17,7 +18,8 @@ PressureSensor::PressureSensor() {
 
 bool PressureSensor::EnableOneMeasure() {
     std::array<std::uint8_t, 1> positions{oneMeasureIndex};
-    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg2_, positions));
+    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg2_, positions),
+                                      devicePressSens);
     // todo: move below to public IsOneMeasureEnabled();
     std::bitset<8> byte;
     ReadBytes(ctrlReg2_, byte);
@@ -32,8 +34,8 @@ bool PressureSensor::PerformReadOut() {
     if (isProbeAvailable()) {
         esp_err_t errorPressure = ReadPressure();
         esp_err_t errorTemp = ReadTemperature();
-        ret = !(IsErrorInCommunication(errorPressure) ||
-                IsErrorInCommunication(errorTemp));
+        ret = !(IsErrorInCommunication(errorPressure, devicePressSens) ||
+                IsErrorInCommunication(errorTemp, devicePressSens));
         ESP_LOGI(devicePressSens, "Pressure is: %du", pressureData_);
         ESP_LOGI(devicePressSens, "Temp is: %f", tempData_);
     }
@@ -42,7 +44,8 @@ bool PressureSensor::PerformReadOut() {
 
 bool PressureSensor::TurnDeviceOn() {
     std::array<std::uint8_t, 1> positions{turnOnIndex};
-    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg1_, positions));
+    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg1_, positions),
+                                      devicePressSens);
     // todo: move below to public IsDeviceOn();
     std::bitset<8> byte;
     ReadBytes(ctrlReg1_, byte);
@@ -55,7 +58,8 @@ bool PressureSensor::TurnDeviceOn() {
 bool PressureSensor::TurnDeviceOff() {
     // todo: implement public IsDeviceOff();
     std::array<std::uint8_t, 1> positions{turnOnIndex};
-    return IsErrorInCommunication(ResetValuesInByte(ctrlReg1_, positions));
+    return IsErrorInCommunication(ResetValuesInByte(ctrlReg1_, positions),
+                                  devicePressSens);
 }
 
 esp_err_t PressureSensor::ReadPressure() {
@@ -88,7 +92,7 @@ bool PressureSensor::isProbeAvailable() {
     std::bitset<8> data{};
     std::size_t pressureBitIndex = 1;
     error = ReadBytes(statusReg_, data);
-    if (!IsErrorInCommunication(error)) {
+    if (!IsErrorInCommunication(error, devicePressSens)) {
         isProbe = static_cast<bool>(data[pressureBitIndex]);
     }
     return isProbe;
@@ -154,21 +158,4 @@ esp_err_t PressureSensor::WriteByte(const std::uint8_t reg,
                                     const std::bitset<8> data) {
     std::uint8_t d = ConvertToUint8(data);
     return smbus_i2c_write_block(PressureCommunicationInfo_, reg, &d, 1);
-}
-
-std::bitset<8> PressureSensor::ConvertToBitset(std::uint8_t byte) {
-    return static_cast<std::bitset<8>>(byte);
-}
-
-std::uint8_t PressureSensor::ConvertToUint8(std::bitset<8> byte) {
-    return static_cast<uint8_t>(byte.to_ulong());
-}
-
-template<std::size_t B>
-long PressureSensor::ConvertToLong(const std::bitset<B>& b) {
-    //© 1997-2005 Bit Twiddling Hacks Sean Eron Anderson
-    struct {
-        long x : B;
-    } s;
-    return s.x = b.to_ulong();
 }

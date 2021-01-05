@@ -42,7 +42,7 @@ void I2CWrapper::ConfigurePmSensorBusInfo() {
 
 void I2CWrapper::ConfigureCo2SensorBusInfo() {
     auto smbus_info = new smbus_info_t;
-    smbus_init(smbus_info, i2cInterface_, CO2SensorAddress_);
+    smbus_init(smbus_info, i2cInterface_, Co2SensorAddress_);
     smbus_set_timeout(smbus_info, 10000 / portTICK_RATE_MS);
     smBusInfoCo2 = smbus_info;
 }
