@@ -36,8 +36,22 @@ bool Co2Sensor::PerformReadout() {
     }
     return isNewData;
 }
-bool Co2Sensor::IsDeviceOn() {
-    return false;
+int Co2Sensor::IsDeviceOn() {
+    int ret = 123;
+    esp_err_t lowByteError = ESP_DEVICE_BUSY;
+    std::uint8_t data;
+    std::uint8_t isWorkingIndex_0 = 1, isWorkingIndex_1 = 2;
+    if (PollForFree()) {
+        lowByteError = smbus_read_byte(Co2CommunicationInfo_,
+                                       operatingModePtr_,
+                                       &data);
+    }
+    if (!IsErrorInCommunication(lowByteError, deviceCo2Sens)) {
+        std::bitset<8> status_data = ConvertToBitset(data);
+        ret = status_data.test(isWorkingIndex_0) &&
+              status_data.test(isWorkingIndex_1);
+    }
+    return ret;
 }
 esp_err_t Co2Sensor::WriteByte(std::uint8_t ptr, std::uint8_t data) {
     esp_err_t error = ESP_DEVICE_BUSY;
@@ -70,4 +84,17 @@ bool Co2Sensor::IsSensorBusyI2C() {
 }
 bool Co2Sensor::IsSensorBusyAnalog() {
     return gpio_get_level(CO2_BUSY_BUTTON);
+}
+bool Co2Sensor::PollForFree() {
+    bool ret = false;
+    TickType_t current_time = xTaskGetTickCount();
+    TickType_t stoptime = current_time + SECOND/2;
+    while (stoptime > current_time){
+        current_time = xTaskGetTickCount();
+        if(IsSensorFree()) {
+            ret = true;
+            break;
+        }
+    }
+    return ret;
 }

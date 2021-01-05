@@ -8,7 +8,7 @@
 #include "esp_log.h"
 #include "bitset"
 #include <tuple>
-
+//todo: implement fan cleaning function
 ParticlesSensor::ParticlesSensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
     ParticlesCommunicationInfo_ = i2cWrapper.GetsmBusInfoPm();
@@ -56,10 +56,14 @@ template<std::size_t B>
 void ParticlesSensor::ConvertReadData(
     const std::array<std::uint8_t, B>& data) {
     // todo: enable calculating flot basing on data.size() or outputFormatByte
+    auto pm1 = static_cast<std::uint16_t>((data[0] << 8u) + data[1]);
     PM25 = static_cast<std::uint16_t>((data[3] << 8u) + data[4]);
     PM10 = static_cast<std::uint16_t>((data[9] << 8u) + data[10]);
+    auto par_siz = static_cast<std::uint16_t>((data[27] << 8u) + data[28]);
+    ESP_LOGI(devicePmSens, "PM1 is: %d", pm1);
     ESP_LOGI(devicePmSens, "PM2.5 is: %d", PM25);
     ESP_LOGI(devicePmSens, "PM10 is: %d", PM10);
+    ESP_LOGI(devicePmSens, "particle size is: %d", par_siz);
 }
 template<std::size_t B>
 std::pair<esp_err_t, esp_err_t>

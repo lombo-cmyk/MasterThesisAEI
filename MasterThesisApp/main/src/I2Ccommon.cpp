@@ -23,7 +23,7 @@ bool I2Ccommon::IsErrorInCommunication(esp_err_t error, const char device[]) {
             ESP_LOGE(device, "Invalid response");
             break;
         case ESP_DEVICE_BUSY:
-            ESP_LOGI(device, "Device busy");
+            ESP_LOGW(device, "Device busy");
             break;
         default:
             ESP_LOGE(device, "Unexpected error: %d", error);

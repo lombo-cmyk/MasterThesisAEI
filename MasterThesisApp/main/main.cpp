@@ -7,13 +7,11 @@
 #include "include/ParticlesSensor.h"
 #include "include//Co2Sensor.h"
 #include "esp_log.h"
-
 extern "C" {
 void app_main();
 }
 
 void app_main(void) {
-//    vTaskDelay(SECOND / 10);
     double CO = 0, humidity = 0;
     auto& intHandler = InterruptHandler::getInstance();
     intHandler.InitializeInterrupts();
@@ -25,7 +23,6 @@ void app_main(void) {
     ps.StartMeasuring(false);
     Co2Sensor Co2 = Co2Sensor();
     Co2.StartMeasuring();
-//    ESP_LOGI(deviceCo2Sens, "Iserror in co2 on: %d", iserror);
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
@@ -33,13 +30,13 @@ void app_main(void) {
                                    ps.GetPM10(),
                                    CO,
 //                                   Co2.GetCo2Value(),
-                                   123,
+                                   Co2.GetCo2Value(),
                                    pressureSensor.GetTemperature(),
                                    humidity,
                                    pressureSensor.GetPressure());
         Lcd.DisplayCurrentState();
         ps.PerformReadout();
         Co2.PerformReadout();
-        vTaskDelay(SECOND / 10);
+        vTaskDelay(SECOND);
     }
 }

@@ -16,19 +16,20 @@ public:
     Co2Sensor();
     bool StartMeasuring();
     bool StopMeasuring();
+    int IsDeviceOn();
+
     bool PerformReadout();
 
     auto GetCo2Value() const -> const std::uint16_t &{
         return Co2Value_;
     }
-
 private:
     smbus_info_t* Co2CommunicationInfo_;
     std::uint16_t Co2Value_ = 0;
-    bool IsDeviceOn();
-    bool IsSensorBusyI2C();
-    bool IsSensorBusyAnalog();
     bool IsSensorFree();
+    bool IsSensorBusyI2C();
+    static bool IsSensorBusyAnalog();
+    bool PollForFree();
     std::pair<esp_err_t, esp_err_t> ReadCo2(std::array<std::uint8_t, 2> &data);
     esp_err_t WriteByte(std::uint8_t ptr, std::uint8_t data);
     static constexpr std::uint8_t operatingModePtr_ = 0x01;

@@ -20,7 +20,7 @@
 #define SAMPLE_PERIOD 1000 // milliseconds
 #define DEBOUNCE_TIME 10 // 70 needed w/o proper HW debouncing
 #define LCD_COLUMNS 16
-#define SECOND 1000
+#define SECOND 100
 
 #define ESP_DEVICE_BUSY 0x111
 
