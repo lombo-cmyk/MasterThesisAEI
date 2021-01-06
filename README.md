@@ -172,14 +172,15 @@ Returns 16-bit raw temperature information from last successful readout with
 Return temperature information from last successful readout in degrees Celsius.
 
 ### Class Particle Sensor
-* `ParticlesSensor()`
+* `ParticlesSensor()`  
 Gets instance of I2CWrapper and reads Particles Sensor device communication 
 information
 * `void StartMeasuring(bool measureFloat)`  
 Starts continuous measurement mode. Returns 0 if success. 
 ESP_ERROR is logged in case of failure.  
 Device is able of providing integer or float (big-endian float IEEE754) data.
-Passing '1' starts measurement in float mode. ** Note: ** measuring floats is
+Passing '1' starts measurement in float mode.  
+**Note:** measuring floats is
 not yet implemented.
 * `void StopMeasuring()`  
 Stops measuring. Returns 0 if success. 
