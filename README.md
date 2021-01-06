@@ -87,7 +87,58 @@ The module is manufactured by Pololu and requires 2.5-5.5V power supply, with
  3.3V or 5V tolerant logic.  
  [Datasheet](https://www.pololu.com/product/2126/resources)
 
+## API reference
 
+### Class InterruptHandler
+Initialize interrupts, set pin to proper mode, menage pushed buttons  
+* `void InitializeInterrupts()`
+* `std::uint16_t GetDisplayState()`
+* `auto SetBacklightFromLcd() -> bool&`
+* `auto GetLcdBacklight() const -> const bool&`
+
+### Class I2CWrapper
+* `void ConfigureCommunication()`
+* `void pingDevice(smbus_info_t* busInfo, const char* device)`
+* `auto GetsmBusInfoDisplay_() -> smbus_info_t*`
+* `auto GetsmBusInfoPressure_() -> smbus_info_t*`
+* `auto GetsmBusInfoPm() -> smbus_info_t*`
+* `auto GetsmBusInfoCo2() -> smbus_info_t*`
+### Class Co2Sensor
+* `Co2Sensor()`
+* `bool StartMeasuring()`
+* `bool StopMeasuring()`
+* `int IsDeviceOn()`
+* `bool PerformReadout()`
+* `auto GetCo2Value() const -> const std::uint16_t&`
+### Class PressureSensor
+* `PressureSensor()`
+* `bool TurnDeviceOn()`
+* `bool TurnDeviceOff()`
+* `bool EnableOneMeasure()`
+* `bool PerformReadOut()`
+* `auto GetRawPressure() const -> const std::bitset<24>&`
+* `auto GetPressure() const -> const unsigned int&`
+* `auto GetRawTemperature() const -> const std::bitset<16>&`
+* `auto GetTemperature() const -> const double&`
+### Class Particle Sensor
+* `ParticlesSensor()`
+* `void StartMeasuring(bool measureFloat)`
+* `void StopMeasuring()`
+* `bool PerformReadout()`
+* `auto GetPM25() const -> const std::uint16_t&`
+* `auto GetPM10() const -> const std::uint16_t&`
+### Class LCD
+* `LCD()`
+* `void DisplayCurrentState()`
+* `void GetCurrentMeasurements(std::uint16_t pm25,
+                                std::uint16_t pm10,
+                                double co,
+                                std::uint16_t co2,
+                                double t,
+                                double h,
+                                unsigned int p)`
+                                
+                                
 ## Considered Sensors
 It would be nice if sensors could communicate with I2C or would be able to
 send readings with analog pins.
