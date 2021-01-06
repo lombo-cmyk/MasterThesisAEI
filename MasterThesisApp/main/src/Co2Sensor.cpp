@@ -27,6 +27,7 @@ bool Co2Sensor::PerformReadout() {
     bool isNewData = false;
     std::array<std::uint8_t, 2> data{};
     std::pair<esp_err_t, esp_err_t> errors;
+    //todo: is it possible to check that new data is available?
     errors = ReadCo2(data);
     if (!IsErrorInCommunication(std::get<0>(errors), deviceCo2Sens) &&
         !IsErrorInCommunication(std::get<1>(errors), deviceCo2Sens)) {
@@ -37,6 +38,7 @@ bool Co2Sensor::PerformReadout() {
     return isNewData;
 }
 int Co2Sensor::IsDeviceOn() {
+    //todo: clean this up
     int ret = 123;
     esp_err_t lowByteError = ESP_DEVICE_BUSY;
     std::uint8_t data;

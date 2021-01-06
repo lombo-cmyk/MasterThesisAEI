@@ -90,26 +90,53 @@ The module is manufactured by Pololu and requires 2.5-5.5V power supply, with
 ## API reference
 
 ### Class InterruptHandler
-Initialize interrupts, set pin to proper mode, menage pushed buttons  
-* `void InitializeInterrupts()`
-* `std::uint16_t GetDisplayState()`
-* `auto SetBacklightFromLcd() -> bool&`
-* `auto GetLcdBacklight() const -> const bool&`
+
+* `void InitializeInterrupts()`  
+Initializes interrupts on pin FORWARD_BUTTON, set pins to proper mode,
+* `std::uint16_t GetDisplayState()`  
+Returns current state of the Display set by interrupt button
+* `auto SetBacklightFromLcd() -> bool&`  
+Sets LCD Backlight LED diode to given value
+* `auto GetLcdBacklight() const -> const bool&`  
+Gets current state of LCD Backlight LED diode
 
 ### Class I2CWrapper
-* `void ConfigureCommunication()`
-* `void pingDevice(smbus_info_t* busInfo, const char* device)`
-* `auto GetsmBusInfoDisplay_() -> smbus_info_t*`
-* `auto GetsmBusInfoPressure_() -> smbus_info_t*`
-* `auto GetsmBusInfoPm() -> smbus_info_t*`
-* `auto GetsmBusInfoCo2() -> smbus_info_t*`
+* `void ConfigureCommunication()`  
+Configures communication with all added devices. Checks if device is alive. 
+ESP_ERROR is logged if device is not responding.
+* `void pingDevice(smbus_info_t* busInfo, const char* device)`  
+Checks if device is alive. 
+ESP_ERROR is logged if device is not responding.
+* `auto GetsmBusInfoDisplay_() -> smbus_info_t*`  
+Returns a pointer to LCD Display device communication information
+* `auto GetsmBusInfoPressure_() -> smbus_info_t*`  
+Returns a pointer to Pressure Sensor device communication information
+* `auto GetsmBusInfoPm() -> smbus_info_t*`  
+Returns a pointer to Particle Sensor device communication information
+* `auto GetsmBusInfoCo2() -> smbus_info_t*`  
+Returns a pointer to Co2 Sensor device communication information
+
 ### Class Co2Sensor
-* `Co2Sensor()`
-* `bool StartMeasuring()`
-* `bool StopMeasuring()`
-* `int IsDeviceOn()`
-* `bool PerformReadout()`
-* `auto GetCo2Value() const -> const std::uint16_t&`
+* `Co2Sensor()`  
+Gets instance of I2CWrapper and reads Co2 Sensor device communication 
+information
+* `bool StartMeasuring()`  
+Starts continuous measurement mode. Returns 0 if success. 
+ESP_ERROR is logged in case of failure.
+* `bool StopMeasuring()`  
+Stops measuring. Returns 0 if success. 
+ESP_ERROR is logged in case of failure.
+* `int IsDeviceOn()`  
+Checks if the device is in measuring mode. If device is not responding* polls
+for response for the maximum of 0.5s. Returns 1 if device is in continuous
+measurement mode.
+* `bool PerformReadout()`  
+Reads data from sensor. Returns 1 if new data is read.
+* `auto GetCo2Value() const -> const std::uint16_t&`  
+Gets last read Co2 value.
+
+*Co2 sensor may not communicate for a short period (about 0.3 sec.) due to 
+the internal processing. 
 ### Class PressureSensor
 * `PressureSensor()`
 * `bool TurnDeviceOn()`
