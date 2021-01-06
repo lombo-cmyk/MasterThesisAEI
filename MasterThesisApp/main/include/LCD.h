@@ -14,6 +14,7 @@
 class LCD {
 public:
     LCD();
+    void DisplayWelcomeMessage() const;
     void DisplayCurrentState();
     void GetCurrentMeasurements(std::uint16_t pm25,
                                 std::uint16_t pm10,
@@ -22,8 +23,8 @@ public:
                                 double t,
                                 double h,
                                 unsigned int p);
-private:
 
+private:
     i2c_lcd1602_info_t* LcdInfo_ = new i2c_lcd1602_info_t;
     bool isBacklight_ = true;
     std::uint64_t backlightTimer_ = esp_timer_get_time();
@@ -37,7 +38,6 @@ private:
     static void AdjustLine(std::string& line);
     void DisplayLine(std::string& line, std::uint8_t row) const;
     void DisplayTwoLines(std::string& line_1, std::string& line_2) const;
-    void DisplayWelcomeMessage() const;
     void DisplayPM25();
     void DisplayPM10();
     void DisplayCO();

@@ -22,7 +22,7 @@ LCD::LCD() {
                      LCD_COLUMNS);
     i2c_lcd1602_reset(LcdInfo_);
     i2c_lcd1602_set_backlight(LcdInfo_, isBacklight_);
-    DisplayWelcomeMessage();
+//    DisplayWelcomeMessage();
 }
 void LCD::GetCurrentMeasurements(std::uint16_t pm25,
                                  std::uint16_t pm10,

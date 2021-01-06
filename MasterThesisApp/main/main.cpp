@@ -18,7 +18,10 @@ void app_main(void) {
     auto& I2cWrapper = I2CWrapper::getInstance();
     I2cWrapper.ConfigureCommunication();
     LCD Lcd = LCD();
+    Lcd.DisplayWelcomeMessage();
     PressureSensor pressureSensor = PressureSensor();
+    pressureSensor.TurnDeviceOn();
+    pressureSensor.EnableOneMeasure();
     ParticlesSensor ps = ParticlesSensor();
     ps.StartMeasuring(false);
     Co2Sensor Co2 = Co2Sensor();

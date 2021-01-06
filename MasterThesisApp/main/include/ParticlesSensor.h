@@ -14,8 +14,8 @@
 class ParticlesSensor: private I2Ccommon{
 public:
     ParticlesSensor();
-    void StartMeasuring(bool measureFloat);
-    void StopMeasuring();
+    bool StartMeasuring(bool measureFloat);
+    bool StopMeasuring();
     bool PerformReadout();
 
     auto GetPM25() const -> const std::uint16_t &{

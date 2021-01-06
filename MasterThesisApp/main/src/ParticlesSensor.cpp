@@ -8,23 +8,23 @@
 #include "esp_log.h"
 #include "bitset"
 #include <tuple>
-//todo: implement fan cleaning function
+// todo: implement fan cleaning function
 ParticlesSensor::ParticlesSensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
     ParticlesCommunicationInfo_ = i2cWrapper.GetsmBusInfoPm();
 }
-void ParticlesSensor::StartMeasuring(bool measureFloat) {
+bool ParticlesSensor::StartMeasuring(bool measureFloat) {
     if (measureFloat) {
         outputFormatByte = 0x03;
     } else {
         outputFormatByte = 0x05;
     }
     std::array<std::uint8_t, 2> data{outputFormatByte, 0x00};
-    IsErrorInCommunication(SetPointerAndWrite(measureStartPtr_, data),
-                           devicePmSens);
+    return IsErrorInCommunication(SetPointerAndWrite(measureStartPtr_, data),
+                                  devicePmSens);
 }
-void ParticlesSensor::StopMeasuring() {
-    IsErrorInCommunication(SetPointer(measureStopPtr_), devicePmSens);
+bool ParticlesSensor::StopMeasuring() {
+    return IsErrorInCommunication(SetPointer(measureStopPtr_), devicePmSens);
 }
 bool ParticlesSensor::PerformReadout() {
     std::array<std::uint8_t, 30> data{};
