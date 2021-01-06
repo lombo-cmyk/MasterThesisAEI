@@ -12,8 +12,28 @@
 PressureSensor::PressureSensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
     PressureCommunicationInfo_ = i2cWrapper.GetsmBusInfoPressure_();
-    TurnDeviceOn();
-    EnableOneMeasure();
+//    TurnDeviceOn();
+//    EnableOneMeasure();
+}
+
+bool PressureSensor::TurnDeviceOn() {
+    std::array<std::uint8_t, 1> positions{turnOnIndex};
+    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg1_, positions),
+                                      devicePressSens);
+    // todo: move below to public IsDeviceOn();
+    std::bitset<8> byte;
+    ReadBytes(ctrlReg1_, byte);
+    if (!byte.test(turnOnIndex)) {
+        ESP_LOGE(devicePressSens, "Device off, reg: %lu", byte.to_ulong());
+    }
+    return ret;
+}
+
+bool PressureSensor::TurnDeviceOff() {
+    // todo: implement public IsDeviceOff();
+    std::array<std::uint8_t, 1> positions{turnOnIndex};
+    return IsErrorInCommunication(ResetValuesInByte(ctrlReg1_, positions),
+                                  devicePressSens);
 }
 
 bool PressureSensor::EnableOneMeasure() {
@@ -40,26 +60,6 @@ bool PressureSensor::PerformReadOut() {
         ESP_LOGI(devicePressSens, "Temp is: %f", tempData_);
     }
     return ret;
-}
-
-bool PressureSensor::TurnDeviceOn() {
-    std::array<std::uint8_t, 1> positions{turnOnIndex};
-    bool ret = IsErrorInCommunication(SetValuesInByte(ctrlReg1_, positions),
-                                      devicePressSens);
-    // todo: move below to public IsDeviceOn();
-    std::bitset<8> byte;
-    ReadBytes(ctrlReg1_, byte);
-    if (!byte.test(turnOnIndex)) {
-        ESP_LOGE(devicePressSens, "Device off, reg: %lu", byte.to_ulong());
-    }
-    return ret;
-}
-
-bool PressureSensor::TurnDeviceOff() {
-    // todo: implement public IsDeviceOff();
-    std::array<std::uint8_t, 1> positions{turnOnIndex};
-    return IsErrorInCommunication(ResetValuesInByte(ctrlReg1_, positions),
-                                  devicePressSens);
 }
 
 esp_err_t PressureSensor::ReadPressure() {

@@ -22,7 +22,7 @@ LCD::LCD() {
                      LCD_COLUMNS);
     i2c_lcd1602_reset(LcdInfo_);
     i2c_lcd1602_set_backlight(LcdInfo_, isBacklight_);
-    DisplayWelcomeMessage();
+//    DisplayWelcomeMessage();
 }
 void LCD::GetCurrentMeasurements(std::uint16_t pm25,
                                  std::uint16_t pm10,
@@ -89,13 +89,13 @@ void LCD::DisplayWelcomeMessage() const {
 }
 
 void LCD::Setbacklight(const std::uint16_t& displayState) {
-    uint64_t tenSeconds = 10000000;
+    uint64_t tenSeconds = SECOND * 10;
     if (displayState == 0 && intHandler_.GetLcdBacklight()) {
         i2c_lcd1602_set_backlight(LcdInfo_, true);
         backlightTimer_ = esp_timer_get_time();
         intHandler_.SetBacklightFromLcd() = false;
     }
-    esp_timer_get_time();
+//    esp_timer_get_time();
     if (displayState == 0 &&
         (esp_timer_get_time() - backlightTimer_) > tenSeconds) {
         i2c_lcd1602_set_backlight(LcdInfo_, false);

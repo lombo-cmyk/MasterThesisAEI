@@ -39,6 +39,7 @@ all application related code.
 ## Used sensors
 Sensors selected after research are presented below. Most of them uses a
  communication protocol (in this case I2C is used) if possible.
+ 
 ### Sensirion SPS30 (aka SparkFun SEN-15103)
 The Sensirion Particulate Matter Sensor SPS30 is a compact, high quality, 
 optical particle sensor.This sensor allows users to measure mass concentration 
@@ -50,6 +51,7 @@ The SPS30 has a five pin interface that can communicate over two different
 protocols: UART and I2C. The SPS30 requires a 5V power supply, but can work 
 with 3.3V and 5V microcontrollers. The logic is 5V and 3.3V tolerant.  
 [Datasheet](https://www.sensirion.com/fileadmin/user_upload/customers/sensirion/Dokumente/9.6_Particulate_Matter/Datasheets/Sensirion_PM_Sensors_SPS30_Datasheet.pdf)
+
 ### Figaro CDM7160
 The CDM7160 CO2 module uses a compact NDIR CO2 sensor. It has high accuracy
 and low power consumption. Stable long term operation and output are
@@ -60,6 +62,7 @@ with both a UART and I2C digital interface. Module requires a 5V power
 supply, the logic is 5V and 3.3V tolerant, but it was designed to work on
 5V. Product has no ESD protection.   
 [Datasheet](https://cdn.sos.sk/productdata/52/08/dadc87c9/cdm7160.pdf)
+
 ### Figaro TSG5342
 The TSG5342 is a battery operable electrochemical sensor in compact size. It
 has good stability derived by use of Figaro’s patented very low concentration 
@@ -67,14 +70,16 @@ of a mixed/prepared alkaline electrolyte. It is expected to live for 7 years.
 The sensors is capable of detecting CO in range 0～10'000ppm with the output
 current 0.7～1.4nA/ppm.  
 [Datasheet](https://www.figaro.co.jp/en/pdf/feature/tgs5342_product_infomation_rev03.pdf)
+
 ### DHT22 (aka AM2302)
 DHT22 output calibrated digital signal. It utilizes exclusive 
 digital-signal-collecting-technique and humidity sensing technology, 
 assuring its reliability and stability.Its sensing elements are connected with
 8-bit single-chip computer. 
 It requires 3.3V or 5V power supply, can measure relative humidity in range
-0-100% and temperature from -40 to 80 degree Celsius.  
+0-100% and temperature from -40 to 80 degrees Celsius.  
 [Datasheet](https://www.sparkfun.com/datasheets/Sensors/Temperature/DHT22.pdf)
+
 ### LPS331AP Module
 The LPS331AP is an ultra compact absolute piezoresistive pressure sensor. It
 includes a monolithic sensing element and an IC interface able to take the
@@ -87,7 +92,128 @@ The module is manufactured by Pololu and requires 2.5-5.5V power supply, with
  3.3V or 5V tolerant logic.  
  [Datasheet](https://www.pololu.com/product/2126/resources)
 
+## API reference
 
+### Class InterruptHandler
+
+* `void InitializeInterrupts()`  
+Initializes interrupts on pin FORWARD_BUTTON, set pins to proper mode,
+* `std::uint16_t GetDisplayState()`  
+Returns current state of the Display set by interrupt button
+* `auto SetBacklightFromLcd() -> bool&`  
+Sets LCD Backlight LED diode to given value
+* `auto GetLcdBacklight() const -> const bool&`  
+Gets current state of LCD Backlight LED diode
+
+### Class I2CWrapper
+* `void ConfigureCommunication()`  
+Configures communication with all added devices. Checks if device is alive. 
+ESP_ERROR is logged if device is not responding.
+* `void pingDevice(smbus_info_t* busInfo, const char* device)`  
+Checks if device is alive. 
+ESP_ERROR is logged if device is not responding.
+* `auto GetsmBusInfoDisplay_() -> smbus_info_t*`  
+Returns a pointer to LCD Display device communication information
+* `auto GetsmBusInfoPressure_() -> smbus_info_t*`  
+Returns a pointer to Pressure Sensor device communication information
+* `auto GetsmBusInfoPm() -> smbus_info_t*`  
+Returns a pointer to Particle Sensor device communication information
+* `auto GetsmBusInfoCo2() -> smbus_info_t*`  
+Returns a pointer to Co2 Sensor device communication information
+
+### Class Co2Sensor
+* `Co2Sensor()`  
+Gets instance of I2CWrapper and reads Co2 Sensor device communication 
+information
+* `bool StartMeasuring()`  
+Starts continuous measurement mode. Returns 0 if success. 
+ESP_ERROR is logged in case of failure.
+* `bool StopMeasuring()`  
+Stops measuring. Returns 0 if success. 
+ESP_ERROR is logged in case of failure.
+* `int IsDeviceOn()`  
+Checks if the device is in measuring mode. If device is not responding* polls
+for response for the maximum of 0.5s. Returns 1 if device is in continuous
+measurement mode. ESP_ERROR is logged in case of failure.
+* `bool PerformReadout()`  
+Reads and saves data from sensor. Returns 1 if new data is read. 
+ESP_ERROR is logged in case of failure.
+* `auto GetCo2Value() const -> const std::uint16_t&`  
+Gets last read Co2 value.
+
+*Co2 sensor may not communicate for a short period (about 0.3 sec.) due to 
+the internal processing. 
+
+### Class PressureSensor
+* `PressureSensor()`  
+Gets instance of I2CWrapper and reads Pressure Sensor device communication 
+information
+* `bool TurnDeviceOn()`  
+Turns device ON. Returns 0 if success. ESP_ERROR is logged in case of
+failure. Measurement not active until manually triggered.
+* `bool TurnDeviceOff()`  
+Turns device ON. Returns 0 if success. ESP_ERROR is logged in case of
+failure.
+* `bool EnableOneMeasure()`  
+Enables one measurement. Return 0 if success. ESP_ERROR is logged in case of
+failure.
+* `bool PerformReadOut()`  
+Reads and saves Temperature and Pressure data from sensor. ESP_ERROR is
+ logged in case of failure. Returns 1 if new data is available.
+* `auto GetRawPressure() const -> const std::bitset<24>&`  
+Returns 24-bit raw pressure information from last successful readout with
+ LSB at position 0.
+* `auto GetPressure() const -> const unsigned int&`  
+Return pressure information from last successful readout in mbar/hPa.
+* `auto GetRawTemperature() const -> const std::bitset<16>&`  
+Returns 16-bit raw temperature information from last successful readout with
+ LSB at position 0.
+* `auto GetTemperature() const -> const double&`  
+Return temperature information from last successful readout in degrees Celsius.
+
+### Class Particle Sensor
+* `ParticlesSensor()`  
+Gets instance of I2CWrapper and reads Particles Sensor device communication 
+information
+* `void StartMeasuring(bool measureFloat)`  
+Starts continuous measurement mode. Returns 0 if success. 
+ESP_ERROR is logged in case of failure.  
+Device is able of providing integer or float (big-endian float IEEE754) data.
+Passing '1' starts measurement in float mode.  
+**Note:** measuring floats is
+not yet implemented.
+* `void StopMeasuring()`  
+Stops measuring. Returns 0 if success. 
+ESP_ERROR is logged in case of failure.
+* `bool PerformReadout()`  
+Reads and saves data from sensor. Returns 1 if new data is read.
+ESP_ERROR is logged in case of failure.
+* `auto GetPM25() const -> const std::uint16_t&`  
+Return PM 2.5 information from last successful readout in mass Concentration
+µg/m<sup>3</sup>
+* `auto GetPM10() const -> const std::uint16_t&`  
+Return PM 10 information from last successful readout in mass Concentration
+µg/m<sup>3</sup>
+
+### Class LCD
+* `LCD()`  
+Gets instance of I2CWrapper and iniliatizes LCD device.
+* `void DisplayCurrentState()`  
+Displays Welcome message on the LCD screen
+* `void DisplayCurrentState()`  
+Displays Current State depending on InterruptHandler::GetDisplayState()
+variable
+* `void GetCurrentMeasurements(std::uint16_t pm25,
+                                std::uint16_t pm10,
+                                double co,
+                                std::uint16_t co2,
+                                double t,
+                                double h,
+                                unsigned int p)`  
+Gets and saves all current measurements in order to display them later.
+
+                                
+                                
 ## Considered Sensors
 It would be nice if sensors could communicate with I2C or would be able to
 send readings with analog pins.
