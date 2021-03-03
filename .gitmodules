@@ -4,3 +4,6 @@
 [submodule "MasterThesisApp/components/esp32-smbus"]
 	path = MasterThesisApp/components/esp32-smbus
 	url = https://github.com/DavidAntliff/esp32-smbus.git
+[submodule "MasterThesisSchematic"]
+	path = MasterThesisSchematic
+	url = https://github.com/lombo-cmyk/MasterThesisSchematic
