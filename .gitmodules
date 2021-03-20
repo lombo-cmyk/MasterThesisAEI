@@ -7,3 +7,6 @@
 [submodule "MasterThesisSchematic"]
 	path = MasterThesisSchematic
 	url = https://github.com/lombo-cmyk/MasterThesisSchematic
+[submodule "MasterThesisApp/components/DHT22-cpp"]
+	path = MasterThesisApp/components/DHT22-cpp
+	url = https://github.com/lombo-cmyk/DHT22-cpp
