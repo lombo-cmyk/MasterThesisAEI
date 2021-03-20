@@ -15,6 +15,7 @@
 #define CO2_BUSY_BUTTON GPIO_NUM_19
 #define SDA_PIN GPIO_NUM_21
 #define SCL_PIN GPIO_NUM_22
+#define DHT_PIN GPIO_NUM_23
 
 #define ESP_INTR_FLAG_DEFAULT 0
 #define SAMPLE_PERIOD 1000 // milliseconds

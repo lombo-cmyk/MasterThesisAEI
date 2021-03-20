@@ -29,7 +29,7 @@ void LCD::GetCurrentMeasurements(std::uint16_t pm25,
                                  double co,
                                  std::uint16_t co2,
                                  double t,
-                                 double h,
+                                 float h,
                                  unsigned int p) {
     PM25_=pm25;
     PM10_=pm10;

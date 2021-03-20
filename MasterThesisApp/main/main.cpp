@@ -7,6 +7,7 @@
 #include "include/ParticlesSensor.h"
 #include "include//Co2Sensor.h"
 #include "esp_log.h"
+#include "DHT.h"
 extern "C" {
 void app_main();
 }
@@ -26,16 +27,19 @@ void app_main(void) {
     ps.StartMeasuring(false);
     Co2Sensor Co2 = Co2Sensor();
     Co2.StartMeasuring();
+    auto dht = DHT();
+    dht.setDHTgpio(DHT_PIN);
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
+        dht.readDHT();
         Lcd.GetCurrentMeasurements(ps.GetPM25(),
                                    ps.GetPM10(),
                                    CO,
 //                                   Co2.GetCo2Value(),
                                    Co2.GetCo2Value(),
                                    pressureSensor.GetTemperature(),
-                                   humidity,
+                                   dht.getHumidity(),
                                    pressureSensor.GetPressure());
         Lcd.DisplayCurrentState();
         ps.PerformReadout();
