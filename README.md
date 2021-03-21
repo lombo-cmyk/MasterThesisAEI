@@ -291,7 +291,7 @@ I'm using CLion only to link all existing and needed header ESP-IDF header files
 ### Setting -> Build, Exectuion, Deployment -> Toolchains:
 * **Cmake:** Bundled (In my case 3.17.3)
 * Make: Let Clion detect
-* **C Compiler:** `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe` 
+* **C Compiler:** `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe`  
 [In my case `C:/ESP_IDF/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe`]
 * **C++ Compiler**: `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++.exe`
 * **Debugger**: Bundled or `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb.exe`
@@ -310,3 +310,8 @@ Optionally ESP-IDF python interpreter can be added here `Your-Path-to/.espressif
 ESP32 is an optional, free plugin to CLion
 * **ESP32 Espressif SDK Path**: `~/esp/esp-idf`
 * **Crosscompiler Path**: `Your-Path-To/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin`
+
+
+### Additional sources:
+* [ESP-32 forum](https://esp32.com/viewtopic.php?t=14844)
+* [Reddit](https://www.reddit.com/r/esp32/comments/cejymt/configure_clion_to_use_espidf/)
