@@ -1,0 +1,11 @@
+Connecting to ethernet using ENC28j60: 
+https://github.com/espressif/esp-idf/blob/9a2d251912faff91e952d84b25c9e6188a44044d/examples/ethernet/enc28j60/main/enc28j60_example_main.c
+
+Dirrent connections: 
+https://github.com/espressif/esp-idf/blob/1067b28707e527f177752741e3aa08b5dc64a4d7/examples/common_components/protocol_examples_common/connect.c
+
+Modbus TCP slave:
+https://github.com/espressif/esp-idf/blob/1067b28707e527f177752741e3aa08b5dc64a4d7/examples/protocols/modbus/tcp/mb_tcp_slave/main/tcp_slave.c
+
+Proper ETH initialization code: examples/ethernet/
+https://github.com/espressif/esp-idf/blob/master/examples/common_components/protocol_examples_common/include/protocol_examples_common.h
