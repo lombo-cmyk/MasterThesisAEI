@@ -282,3 +282,31 @@ send readings with analog pins.
 *One wire is capable of providing communication to more devices with a single
 wire. Power can also be provided with the same wire, although it's more 
 recommended to use a separate connection for it. 
+
+
+
+# Setting Clion to work with ESP-IDF Projects with Windows 10 (As for 21.03.2021 ESP-IDF v4.3)
+I'm using CLion only to link all existing and needed header ESP-IDF header files. I'm not flashing the controller from IDE since it works significantly slower, although it's possible. To flash the controller I'm using standard ESP-IDF Command Prompt.  
+
+### Setting -> Build, Exectuion, Deployment -> Toolchains:
+* **Cmake:** Bundled (In my case 3.17.3)
+* Make: Let Clion detect
+* **C Compiler:** `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe` 
+[In my case `C:/ESP_IDF/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe`]
+* **C++ Compiler**: `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++.exe`
+* **Debugger**: Bundled or `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb.exe`
+> NOTE: esp-2020r3-8.4.0 may vary between different ESP-IDF versions.  
+
+### Setting -> Build, Exectuion, Deployment -> CMake:
+* **CMake options**: `-DIDF_PATH= ~/esp/esp-idf`  
+  [In my case `-DIDF_PATH=C:/Users/lukaszk/esp/esp-idf`]
+* **Environment**: `IDF_PATH= ~/esp/esp-idf; PATH=Your-Path-to/.espressif/python_env/idf4.3_py3.8_env/Scripts`
+> IDF-PATH has to be put in both places, With PATH I'm overwriting my own python added to PATH Environment variables.
+
+### Setting -> Build, Exectuion, Deployment -> Python Interpreter:
+Optionally ESP-IDF python interpreter can be added here `Your-Path-to/.espressif/python_env/idf4.3_py3.8_env/Scripts/python.exe`
+
+###  Setting -> Build, Exectuion, Deployment -> ESP32 config:
+ESP32 is an optional, free plugin to CLion
+* **ESP32 Espressif SDK Path**: `~/esp/esp-idf`
+* **Crosscompiler Path**: `Your-Path-To/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin`
