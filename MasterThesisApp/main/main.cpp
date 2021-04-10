@@ -8,6 +8,9 @@
 #include "include//Co2Sensor.h"
 #include "esp_log.h"
 #include "DHT.h"
+#include "EthernetW5500.h"
+#include "Modbus.h"
+
 extern "C" {
 void app_main();
 }
@@ -29,6 +32,8 @@ void app_main(void) {
     Co2.StartMeasuring();
     auto dht = DHT();
     dht.setDHTgpio(DHT_PIN);
+    auto& ethManager = EthernetW5500::getInstance();
+    auto& modbusManager = Modbus::getInstance();
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
