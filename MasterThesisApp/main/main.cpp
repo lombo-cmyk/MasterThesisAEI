@@ -33,6 +33,8 @@ void app_main(void) {
     auto dht = DHT();
     dht.setDHTgpio(DHT_PIN);
     auto& ethManager = EthernetW5500::getInstance();
+    ethManager.SelectSpiInterface(SPI2_HOST);
+    ethManager.ConfigureAndStart();
     auto& modbusManager = Modbus::getInstance();
     for (;;) {
         pressureSensor.PerformReadOut();
