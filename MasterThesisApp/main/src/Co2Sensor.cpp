@@ -8,6 +8,8 @@
 #include <iostream>
 #include "include/Converter.h"
 #include "include/Definitions.h"
+#include "Modbus.h"
+#include "ModbusDefinitions.h"
 
 Co2Sensor::Co2Sensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
@@ -34,6 +36,7 @@ bool Co2Sensor::PerformReadout() {
         isNewData = true;
         Co2Value_ = (data[1] << 8u) + data[0];
         ESP_LOGI(deviceCo2Sens, "Co2 readout: %d", Co2Value_);
+        UpdateModbusRegisters();
     }
     return isNewData;
 }
@@ -99,4 +102,12 @@ bool Co2Sensor::PollForFree() {
         }
     }
     return ret;
+}
+void Co2Sensor::UpdateModbusRegisters() const {
+    auto& modbusManager = Modbus::getInstance();
+    vPortEnterCritical(&modbusMutex);
+    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
+    regHolding[indexCo2] = Co2Value_;
+    modbusManager.UpdateHoldingRegs(regHolding);
+    vPortExitCritical(&modbusMutex);
 }

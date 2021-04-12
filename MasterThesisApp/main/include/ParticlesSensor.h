@@ -10,8 +10,6 @@
 #include <memory>
 #include <tuple>
 #include "I2Ccommon.h"
-#include "Modbus.h"
-#include "ModbusDefinitions.h"
 
 class ParticlesSensor: private I2Ccommon{
 public:

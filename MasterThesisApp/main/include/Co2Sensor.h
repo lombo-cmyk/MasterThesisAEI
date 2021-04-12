@@ -32,6 +32,7 @@ private:
     bool PollForFree();
     std::pair<esp_err_t, esp_err_t> ReadCo2(std::array<std::uint8_t, 2> &data);
     esp_err_t WriteByte(std::uint8_t ptr, std::uint8_t data);
+    void UpdateModbusRegisters() const;
     static constexpr std::uint8_t operatingModePtr_ = 0x01;
     static constexpr std::uint8_t readStatusPtr_ = 0x02;
     static constexpr std::uint8_t lowCo2DataPtr_ = 0x03;

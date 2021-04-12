@@ -5,6 +5,8 @@
 #include "include/ParticlesSensor.h"
 #include "include/I2CWrapper.h"
 #include "include/Definitions.h"
+#include "ModbusDefinitions.h"
+#include "Modbus.h"
 #include "esp_log.h"
 #include "bitset"
 #include <tuple>
