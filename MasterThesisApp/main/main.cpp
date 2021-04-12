@@ -21,6 +21,12 @@ void app_main(void) {
     intHandler.InitializeInterrupts();
     auto& I2cWrapper = I2CWrapper::getInstance();
     I2cWrapper.ConfigureCommunication();
+
+    auto& ethManager = EthernetW5500::getInstance();
+    ethManager.SelectSpiInterface(SPI2_HOST);
+    ethManager.ConfigureAndStart();
+    auto& modbusManager = Modbus::getInstance();
+
     LCD Lcd = LCD();
     Lcd.DisplayWelcomeMessage();
     PressureSensor pressureSensor = PressureSensor();
@@ -32,10 +38,17 @@ void app_main(void) {
     Co2.StartMeasuring();
     auto dht = DHT();
     dht.setDHTgpio(DHT_PIN);
-    auto& ethManager = EthernetW5500::getInstance();
-    ethManager.SelectSpiInterface(SPI2_HOST);
-    ethManager.ConfigureAndStart();
-    auto& modbusManager = Modbus::getInstance();
+
+
+    static uint8_t ucParameterToPass;
+    TaskHandle_t xHandle = nullptr;
+    xTaskCreate(Modbus::RunSlaveTask,
+                "Modbus_task",
+                2048,
+                &ucParameterToPass,
+                5,
+                &xHandle);
+
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();

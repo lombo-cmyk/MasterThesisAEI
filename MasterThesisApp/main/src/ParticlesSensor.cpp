@@ -37,6 +37,7 @@ bool ParticlesSensor::PerformReadout() {
             IsCrcInDataValid(data)) {
             ConvertReadData(data);
             isNewData = true;
+            UpdateModbusRegisters();
         }
     }
     return isNewData;
@@ -179,4 +180,13 @@ bool ParticlesSensor::IsCrcInDataValid(
         }
     }
     return valid;
+}
+void ParticlesSensor::UpdateModbusRegisters() const {
+    auto& modbusManager = Modbus::getInstance();
+    vPortEnterCritical(&modbusMutex);
+    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
+    regHolding[indexPm25] = PM25;
+    regHolding[indexPm10] = PM10;
+    modbusManager.UpdateHoldingRegs(regHolding);
+    vPortExitCritical(&modbusMutex);
 }

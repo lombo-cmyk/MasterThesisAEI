@@ -23,6 +23,16 @@
 #define LCD_COLUMNS 16
 #define SECOND 100
 
+enum regIndex {
+    indexPm25,
+    indexPm10,
+    indexCo,
+    indexCo2,
+    indexTemperature,
+    indexHumidity,
+    indexPressure
+};
+
 #define ESP_DEVICE_BUSY 0x111
 
 constexpr char deviceLCD[] = "LCD";

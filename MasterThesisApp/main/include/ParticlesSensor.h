@@ -10,6 +10,8 @@
 #include <memory>
 #include <tuple>
 #include "I2Ccommon.h"
+#include "Modbus.h"
+#include "ModbusDefinitions.h"
 
 class ParticlesSensor: private I2Ccommon{
 public:
@@ -49,6 +51,8 @@ private:
     static std::uint8_t CalculateCrc(std::uint8_t data_0, std::uint8_t data_1);
     template<std::size_t B>
     bool IsCrcInDataValid(const std::array<std::uint8_t, B> &data) const;
+
+    void UpdateModbusRegisters() const;
 
 };
 
