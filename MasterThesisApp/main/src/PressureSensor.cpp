@@ -8,12 +8,14 @@
 #include "include/Definitions.h"
 #include "esp_log.h"
 #include "include/Converter.h"
+#include "ModbusDefinitions.h"
+#include "Modbus.h"
 
 PressureSensor::PressureSensor() {
     auto& i2cWrapper = I2CWrapper::getInstance();
     PressureCommunicationInfo_ = i2cWrapper.GetsmBusInfoPressure_();
-//    TurnDeviceOn();
-//    EnableOneMeasure();
+    //    TurnDeviceOn();
+    //    EnableOneMeasure();
 }
 
 bool PressureSensor::TurnDeviceOn() {
@@ -58,6 +60,7 @@ bool PressureSensor::PerformReadOut() {
                 IsErrorInCommunication(errorTemp, devicePressSens));
         ESP_LOGI(devicePressSens, "Pressure is: %du", pressureData_);
         ESP_LOGI(devicePressSens, "Temp is: %f", tempData_);
+        UpdateModbusRegisters();
     }
     return ret;
 }
@@ -158,4 +161,13 @@ esp_err_t PressureSensor::WriteByte(const std::uint8_t reg,
                                     const std::bitset<8> data) {
     std::uint8_t d = ConvertToUint8(data);
     return smbus_i2c_write_block(PressureCommunicationInfo_, reg, &d, 1);
+}
+void PressureSensor::UpdateModbusRegisters() const {
+    auto& modbusManager = Modbus::getInstance();
+    vPortEnterCritical(&modbusMutex);
+    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
+    regHolding[indexTemperature] = tempData_;
+    regHolding[indexPressure] = pressureData_;
+    modbusManager.UpdateHoldingRegs(regHolding);
+    vPortExitCritical(&modbusMutex);
 }

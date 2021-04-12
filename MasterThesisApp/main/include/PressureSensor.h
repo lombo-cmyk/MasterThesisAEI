@@ -12,7 +12,7 @@
 #include "smbus.h"
 #include "I2Ccommon.h"
 
-class PressureSensor: private I2Ccommon {
+class PressureSensor : private I2Ccommon {
 public:
     PressureSensor();
     bool TurnDeviceOn();
@@ -33,6 +33,7 @@ public:
     auto GetTemperature() const -> const double& {
         return tempData_;
     }
+
 private:
     static constexpr std::uint_fast8_t whoIAmReg_ = 0x0F;
     static constexpr std::uint8_t ctrlReg1_ = 0x20;
@@ -68,6 +69,7 @@ private:
     esp_err_t ResetValuesInByte(std::uint8_t reg,
                                 std::array<std::uint8_t, B> positions);
     esp_err_t WriteByte(std::uint8_t reg, std::bitset<8> data);
+    void UpdateModbusRegisters() const;
 };
 
 #endif // MASTERTHESISAPP_PRESSURESENSOR_H

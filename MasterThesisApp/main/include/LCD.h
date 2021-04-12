@@ -31,7 +31,7 @@ private:
     InterruptHandler& intHandler_ = InterruptHandler::getInstance();
     double CO_ = 0, temperature_ = 0;
     float humidity_ = 0;
-    std::uint16_t PM25_ = 0, PM10_ = 0, CO2_ = 0 ;
+    std::uint16_t PM25_ = 0, PM10_ = 0, CO2_ = 0;
     unsigned int pressure_ = 0;
     template<typename T>
     std::string ConvertNumberToString(T number, std::uint8_t precision) const;

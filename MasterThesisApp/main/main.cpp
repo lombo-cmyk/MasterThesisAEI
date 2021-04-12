@@ -14,7 +14,15 @@
 extern "C" {
 void app_main();
 }
-
+void UpdateModbusRegistersDHT(float humidity) {
+    // todo: move it somewhere else
+    auto& modbusManager = Modbus::getInstance();
+    vPortEnterCritical(&modbusMutex);
+    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
+    regHolding[indexHumidity] = humidity;
+    modbusManager.UpdateHoldingRegs(regHolding);
+    vPortExitCritical(&modbusMutex);
+}
 void app_main(void) {
     double CO = 0, humidity = 0;
     auto& intHandler = InterruptHandler::getInstance();
@@ -39,7 +47,6 @@ void app_main(void) {
     auto dht = DHT();
     dht.setDHTgpio(DHT_PIN);
 
-
     static uint8_t ucParameterToPass;
     TaskHandle_t xHandle = nullptr;
     xTaskCreate(Modbus::RunSlaveTask,
@@ -53,17 +60,19 @@ void app_main(void) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
         dht.readDHT();
-        Lcd.GetCurrentMeasurements(ps.GetPM25(),
-                                   ps.GetPM10(),
-                                   CO,
-//                                   Co2.GetCo2Value(),
-                                   Co2.GetCo2Value(),
-                                   pressureSensor.GetTemperature(),
-                                   dht.getHumidity(),
-                                   pressureSensor.GetPressure());
+        Lcd.GetCurrentMeasurements(
+            ps.GetPM25(),
+            ps.GetPM10(),
+            CO,
+            //                                   Co2.GetCo2Value(),
+            Co2.GetCo2Value(),
+            pressureSensor.GetTemperature(),
+            dht.getHumidity(),
+            pressureSensor.GetPressure());
         Lcd.DisplayCurrentState();
         ps.PerformReadout();
         Co2.PerformReadout();
+        UpdateModbusRegistersDHT(dht.getHumidity());
         vTaskDelay(SECOND);
     }
 }
