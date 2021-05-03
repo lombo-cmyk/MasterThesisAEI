@@ -1,0 +1,10 @@
+//
+// Created by lukaszk on 02.05.2021.
+//
+
+#ifndef MASTERTHESISAPP_APPLICATIONEXECUTOR_H
+#define MASTERTHESISAPP_APPLICATIONEXECUTOR_H
+
+class ApplicationExecutor {};
+
+#endif // MASTERTHESISAPP_APPLICATIONEXECUTOR_H
