@@ -2,7 +2,7 @@
 // Created by lukaszk on 12.07.2020.
 //
 
-#include "include/InterruptHandler.h"
+#include "InterruptHandler.h"
 
 void InterruptHandler::DisplayNextState(void* arg) {
     auto& instance = InterruptHandler::getInstance();

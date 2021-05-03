@@ -2,12 +2,12 @@
 // Created by lukaszk on 02.01.2021.
 //
 
-#include "include/Co2Sensor.h"
-#include "include/I2CWrapper.h"
+#include "Co2Sensor.h"
+#include "I2CWrapper.h"
 #include "smbus.h"
 #include <iostream>
-#include "include/Converter.h"
-#include "include/Definitions.h"
+#include "Converter.h"
+#include "Definitions.h"
 #include "Modbus.h"
 #include "ModbusDefinitions.h"
 

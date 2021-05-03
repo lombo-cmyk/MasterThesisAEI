@@ -3,11 +3,11 @@
 //
 
 #include <bitset>
-#include "include/PressureSensor.h"
+#include "PressureSensor.h"
 #include "smbus.h"
-#include "include/Definitions.h"
+#include "Definitions.h"
 #include "esp_log.h"
-#include "include/Converter.h"
+#include "Converter.h"
 #include "ModbusDefinitions.h"
 #include "Modbus.h"
 

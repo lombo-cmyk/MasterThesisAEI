@@ -2,8 +2,8 @@
 // Created by lukaszk on 19.12.2020.
 //
 
-#include "include/I2CWrapper.h"
-#include "include/Definitions.h"
+#include "I2CWrapper.h"
+#include "Definitions.h"
 #include "esp_log.h"
 #include "smbus.h"
 #include "driver/i2c.h"

@@ -1,11 +1,11 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "include/LCD.h"
-#include "include//I2CWrapper.h"
-#include "include/PressureSensor.h"
-#include "include/ParticlesSensor.h"
-#include "include//Co2Sensor.h"
+#include "LCD.h"
+#include "I2CWrapper.h"
+#include "PressureSensor.h"
+#include "ParticlesSensor.h"
+#include "Co2Sensor.h"
 #include "esp_log.h"
 #include "DHT.h"
 #include "EthernetW5500.h"
@@ -17,15 +17,6 @@
 extern "C" {
 void app_main();
 }
-//void UpdateModbusRegistersDHT(float humidity) {
-//    // todo: move it somewhere else
-//    auto& modbusManager = Modbus::getInstance();
-//    vPortEnterCritical(&modbusMutex);
-//    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
-//    regHolding[indexHumidity] = humidity;
-//    modbusManager.UpdateHoldingRegs(regHolding);
-//    vPortExitCritical(&modbusMutex);
-//}
 void app_main(void) {
     double CO = 0;
 

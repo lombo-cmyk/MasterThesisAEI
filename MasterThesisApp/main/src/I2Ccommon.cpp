@@ -2,8 +2,8 @@
 // Created by lukaszk on 26.12.2020.
 //
 
-#include "include/I2Ccommon.h"
-#include "include/Definitions.h"
+#include "I2Ccommon.h"
+#include "Definitions.h"
 bool I2Ccommon::IsErrorInCommunication(esp_err_t error, const char device[]) {
     bool ret = true;
     currentError_ = error;

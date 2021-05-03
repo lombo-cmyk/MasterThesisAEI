@@ -2,10 +2,10 @@
 // Created by lukaszk on 16.07.2020.
 //
 
-#include "include/LCD.h"
-#include "include/Definitions.h"
+#include "LCD.h"
+#include "Definitions.h"
 #include "string"
-#include "include/I2CWrapper.h"
+#include "I2CWrapper.h"
 #include <stdexcept>
 #include <iomanip>
 #include <sstream>
