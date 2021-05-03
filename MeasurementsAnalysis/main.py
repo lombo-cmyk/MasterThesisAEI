@@ -78,6 +78,10 @@ def main():
     create_boxplot(title, filename, xlabel, ylabel,
                    merged_df)
 
+    plt.scatter(measurements[esp]-20, range(0, measurements[esp].shape[0]))
+    plt.scatter(measurements[meter], range(0, measurements[esp].shape[0]))
+    plt.show()
+
 
 if __name__ == '__main__':
     main()
