@@ -39,3 +39,7 @@ LICENSE
 *.exe
 *.out
 *.app
+
+# Output plots
+MeasurementsAnalysis/temp_plots/
+
