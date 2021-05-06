@@ -42,4 +42,5 @@ LICENSE
 
 # Output plots
 MeasurementsAnalysis/temp_plots/
+MeasurementsAnalysis/__pycache__/
 

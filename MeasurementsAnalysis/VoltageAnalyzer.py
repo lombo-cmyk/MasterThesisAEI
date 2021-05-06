@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 
 class VoltageAnalyzer:
 
-    results_path = "measurements/OneTimeMeasureVoltage.csv"
     diff_col = "Difference"
 
-    def __init__(self, working_dir: str):
+    def __init__(self, working_dir: str, file: str):
         self.working_directory = working_dir
+        self.file_path = file
         self.results_raw = self.__get_measurements()
-        self.raw, self.esp, self.meter, *others = self.__get_measurements()
+        self.raw, self.esp, self.meter, *others = self.__get_column_names()
         if others:
             raise RuntimeError('Not all columns were properly unpacked')
         self.results_raw[self.diff_col] = self.results_raw[self.esp] - \
@@ -23,7 +23,7 @@ class VoltageAnalyzer:
         self.results_processed = None
 
     def __get_measurements(self):
-        return pd.read_csv(self.results_path, sep=";")
+        return pd.read_csv(self.file_path, sep=";")
 
     def __get_column_names(self):
         return self.results_raw.columns
@@ -48,7 +48,7 @@ class VoltageAnalyzer:
 
     def __drop_outliers(self):
         z_score = np.abs(stats.zscore(self.results_raw[self.diff_col]))
-        threshold = 1.0
+        threshold = 1
         indexes_to_drop = np.where(z_score > threshold)[0]
         return self.results_raw.drop(index=indexes_to_drop), indexes_to_drop
 
