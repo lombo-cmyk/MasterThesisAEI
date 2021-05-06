@@ -1,6 +1,11 @@
 import os
 from datetime import datetime
 from VoltageAnalyzer import VoltageAnalyzer
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument("--file", help="Path to parsed file", required=True)
+args = parser.parse_args()
 
 
 def create_directories():
@@ -15,7 +20,11 @@ def create_directories():
 
 
 def main():
-    analyzer = VoltageAnalyzer(create_directories())
+    file_to_parse = None
+    if args.file:
+        file_to_parse = args.file
+
+    analyzer = VoltageAnalyzer(create_directories(), file_to_parse)
     analyzer.create_raw_values_boxplot()
     analyzer.process_results()
     analyzer.create_processed_values_boxplot()
