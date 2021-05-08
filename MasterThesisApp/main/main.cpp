@@ -21,20 +21,10 @@ void app_main();
 
 void app_main(void) {
     double CO = 0;
-
-//    adc1_config_width(ADC_WIDTH_BIT_12);
-//    adc1_config_channel_atten(ADC1_CHANNEL_5, ADC_ATTEN_DB_11);
-//    auto* adc_chars = static_cast<esp_adc_cal_characteristics_t*>(
-//        malloc(sizeof(esp_adc_cal_characteristics_t)));
-//    esp_adc_cal_characterize(ADC_UNIT_1,
-//                             ADC_ATTEN_DB_11,
-//                             ADC_WIDTH_BIT_12,
-//                             ESP_ADC_CAL_VAL_DEFAULT_VREF,
-//                             adc_chars);
+    esp_log_level_set("*", ESP_LOG_WARN);
     auto adc_chars = new esp_adc_cal_characteristics_t;
     ConfigureADC(adc_chars);
     int val = 0;
-    std::uint64_t timeStart = 0, timeStop = 0;
 
     auto& intHandler = InterruptHandler::getInstance();
     intHandler.InitializeInterrupts();
@@ -67,6 +57,7 @@ void app_main(void) {
                 &xHandle);
 
     for (;;) {
+        ethManager.PrintShit();
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
         dht.ReadDHT();
@@ -95,6 +86,7 @@ void app_main(void) {
             average+=*voltage;
         }
         average/=probes;
+        CO=average;
         ESP_LOGI(deviceCoSens, "::::Measured CO level RAW:::: %d", val);
 //        ESP_LOGI(deviceCoSens,
 //                 "::::Measurement time:::: %llu",
