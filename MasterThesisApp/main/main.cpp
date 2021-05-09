@@ -95,6 +95,7 @@ void app_main(void) {
                  "::::Measured CO level VOLTAGE:::: %d",
                  average);
 
+        ethManager.reconfigureDriver();
         vTaskDelay(SECOND);
     }
 }
