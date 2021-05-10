@@ -105,9 +105,5 @@ bool Co2Sensor::PollForFree() {
 }
 void Co2Sensor::UpdateModbusRegisters() const {
     auto& modbusManager = Modbus::getInstance();
-    vPortEnterCritical(&modbusMutex);
-    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
-    regHolding[indexCo2] = Co2Value_;
-    modbusManager.UpdateHoldingRegs(regHolding);
-    vPortExitCritical(&modbusMutex);
+    modbusManager.UpdateHoldingRegs(indexCo2, Co2Value_);
 }

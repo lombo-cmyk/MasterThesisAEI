@@ -89,10 +89,10 @@ void app_main(void) {
 //        timeStop = esp_timer_get_time();
         const int probes = 64;
         std::uint32_t average=0;
-        auto voltage = new std::uint32_t;
+        std::uint32_t voltage = 0;
         for (int i=0; i<probes; i++){
-            esp_adc_cal_get_voltage(ADC_CHANNEL_5, adc_chars, voltage);
-            average+=*voltage;
+            esp_adc_cal_get_voltage(ADC_CHANNEL_5, adc_chars, &voltage);
+            average+=voltage;
         }
         average/=probes;
         ESP_LOGI(deviceCoSens, "::::Measured CO level RAW:::: %d", val);
