@@ -42,7 +42,7 @@ LICENSE
 
 # Output plots
 MeasurementsAnalysis/temp_plots/
+MeasurementsAnalysis/polling/
 MeasurementsAnalysis/__pycache__/
-MeasurementsAnalysis/output.txt
 
 

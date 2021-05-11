@@ -7,6 +7,17 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 
 
+def create_directories(upstream_folder_name: str):
+    script_dir = os.path.dirname(__file__)
+    results_dir = os.path.join(script_dir, upstream_folder_name + '/')
+    current_working_dir = os.path.join(results_dir, datetime.now().strftime(
+        "%Y_%m_%d_%H_%M_%S/"))
+    if not os.path.isdir(results_dir):
+        os.makedirs(results_dir)
+    os.makedirs(current_working_dir)
+    return current_working_dir
+
+
 class VoltageAnalyzer:
 
     diff_col = "Difference"
@@ -75,7 +86,7 @@ class VoltageAnalyzer:
                  f" Mean:" \
                  f" {round(self.results_processed[self.diff_col].mean(), 2)}"
         self.__create_boxplots(title, filename, xlabel, ylabel,
-                       self.results_processed[[self.diff_col]])
+                               self.results_processed[[self.diff_col]])
 
     def create_comparison_boxplot(self):
         merged_df = pd.DataFrame({'Undropped': self.results_raw[self.diff_col],
@@ -123,4 +134,3 @@ class VoltageAnalyzer:
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         self.__save_fig("scatter_processed")
-
