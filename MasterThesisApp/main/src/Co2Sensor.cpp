@@ -105,5 +105,7 @@ bool Co2Sensor::PollForFree() {
 }
 void Co2Sensor::UpdateModbusRegisters() const {
     auto& modbusManager = Modbus::getInstance();
-    modbusManager.UpdateHoldingRegs(indexCo2, Co2Value_);
+    std::array<std::uint8_t , 1> index{indexCo2};
+    std::array<float , 1> co2{static_cast<float>(Co2Value_)};
+    modbusManager.UpdateHoldingRegs(index, co2);
 }

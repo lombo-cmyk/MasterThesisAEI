@@ -59,7 +59,9 @@ void app_main(void) {
     for (;;) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
-        dht.ReadDHT();
+        if (dht.ReadDHT()==0){
+            dht.UpdateModbusRegisters(indexHumidity);
+        }
         Lcd.GetCurrentMeasurements(
             ps.GetPM25(),
             ps.GetPM10(),

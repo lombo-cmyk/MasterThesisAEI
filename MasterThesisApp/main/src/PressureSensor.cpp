@@ -164,11 +164,8 @@ esp_err_t PressureSensor::WriteByte(const std::uint8_t reg,
 }
 void PressureSensor::UpdateModbusRegisters() const {
     auto& modbusManager = Modbus::getInstance();
-//    vPortEnterCritical(&modbusMutex);
-//    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
-//    regHolding[indexTemperature] = tempData_;
-//    regHolding[indexPressure] = pressureData_;
-    modbusManager.UpdateHoldingRegs(indexTemperature, tempData_);
-    modbusManager.UpdateHoldingRegs(indexPressure, pressureData_);
-//    vPortExitCritical(&modbusMutex);
+    std::array<std::uint8_t , 2> index{indexTemperature, indexPressure};
+    std::array<float , 2> values{static_cast<float>(tempData_),
+                                 static_cast<float>(pressureData_)};
+    modbusManager.UpdateHoldingRegs(index, values);
 }

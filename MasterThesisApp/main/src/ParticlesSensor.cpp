@@ -185,11 +185,8 @@ bool ParticlesSensor::IsCrcInDataValid(
 }
 void ParticlesSensor::UpdateModbusRegisters() const {
     auto& modbusManager = Modbus::getInstance();
-//    vPortEnterCritical(&modbusMutex);
-//    holdingRegParams_t regHolding = modbusManager.GetHoldingRegs();
-//    regHolding[indexPm25] = PM25;
-//    regHolding[indexPm10] = PM10;
-    modbusManager.UpdateHoldingRegs(indexPm25, PM25);
-    modbusManager.UpdateHoldingRegs(indexPm10, PM10);
-//    vPortExitCritical(&modbusMutex);
+    std::array<std::uint8_t , 2> index{indexPm25, indexPm10};
+    std::array<float , 2> values{static_cast<float>(PM25),
+                                static_cast<float>(PM10)};
+    modbusManager.UpdateHoldingRegs(index, values);
 }
