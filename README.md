@@ -292,16 +292,17 @@ I'm using CLion only to link all existing and needed header ESP-IDF header files
 * **Cmake:** Bundled (In my case 3.17.3)
 * Make: Let Clion detect
 * **C Compiler:** `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe`  
-[In my case `C:/ESP_IDF/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe`]
+  > In my case `C:/ESP_IDF/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe`
 * **C++ Compiler**: `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++.exe`
 * **Debugger**: Bundled or `Your-Path-to/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb.exe`
 > NOTE: esp-2020r3-8.4.0 may vary between different ESP-IDF versions.  
 
 ### Setting -> Build, Exectuion, Deployment -> CMake:
+> It seems to be important to add those options sequentially: IDF_PATH -> Run Cmake -> PATH -> Run Cmake *-> If needed -> -DIDF_PATH -> Run Cmake*
 * **CMake options**: `-DIDF_PATH= ~/esp/esp-idf`  
-  [In my case `-DIDF_PATH=C:/Users/lukaszk/esp/esp-idf`]
+  > As for ESP-IDF v4.4 seems not to be needed anymore, In my case `-DIDF_PATH=C:/Users/lukaszk/esp/esp-idf`
 * **Environment**: `IDF_PATH= ~/esp/esp-idf; PATH=Your-Path-to/.espressif/python_env/idf4.3_py3.8_env/Scripts`
-> IDF-PATH has to be put in both places, With PATH I'm overwriting my own python added to PATH Environment variables.
+  > IDF-PATH has to be put in both places('D' is a Cmake flag), With PATH I'm overwriting my own python added to PATH Environment variables.
 
 ### Setting -> Build, Exectuion, Deployment -> Python Interpreter:
 Optionally ESP-IDF python interpreter can be added here `Your-Path-to/.espressif/python_env/idf4.3_py3.8_env/Scripts/python.exe`
