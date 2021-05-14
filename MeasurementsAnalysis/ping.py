@@ -1,28 +1,29 @@
+import csv
 from pythonping import ping
 from datetime import datetime
-from time import sleep
 from multiprocessing import Process
-from pyModbusTCP.client import ModbusClient
 from pymodbus.constants import Endian
 from pymodbus.client.sync import ModbusTcpClient
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.exceptions import ConnectionException
-import csv
 from msvcrt import kbhit as windows_key_press
 from VoltageAnalyzer import create_directories
+from multiprocessing import Event
+from argparse import ArgumentParser
 
 
-def ping_to_file(cwd: str):
+def ping_to_file(cwd: str, event: Event, ip: str):
     while True:
-        if windows_key_press():
+        if event.wait(timeout=5):
+            print("Ping task done...")
             break
+
         file = open(f"{cwd}/output.txt", 'a+')
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         file.writelines(f"{current_time}\n")
-        ping('192.168.11.3', verbose=True, out=file)
+        ping(ip, verbose=True, out=file)
         file.close()
-        sleep(5)
 
 
 def get_decoders(modbus_data: list, index: int):
@@ -40,22 +41,22 @@ def create_modbus_output_file(cwd: str):
         writer.writerow(column_names)
 
 
-def modbus(cwd: str):
+def modbus(cwd: str, event: Event, ip: str):
     create_modbus_output_file(cwd)
-    unit = 0x01
-    client = ModbusTcpClient(host="192.168.11.3", port=502, timeout=25)
+    slave_address = 0x01
+    client = ModbusTcpClient(host=ip, port=502, timeout=25)
     while True:
-        if windows_key_press():
+        if event.wait(timeout=5):
+            print("Modbus task done...")
             break
         is_connected = client.connect()
         res = None
         if is_connected:
             try:
-                res = client.read_holding_registers(0, 14, unit=unit)
+                res = client.read_holding_registers(0, 14, unit=slave_address)
             except ConnectionException:
                 print("Connection failed")
             if res:
-                # for i in range(0, 7):
                 decoders = [get_decoders(res.registers, i) for i in
                             range(0, 7)]
                 values = [decoder.decode_32bit_float() for decoder in decoders]
@@ -67,18 +68,33 @@ def modbus(cwd: str):
                     writer = csv.writer(file, )
                     writer.writerow(values)
         client.close()
-        sleep(5)
+
+
+def finisher(event: Event):
+    while True:
+        if windows_key_press():
+            event.set()
+            print("Finishing in progress...")
+            break
 
 
 def main():
+    argpars = ArgumentParser()
+    argpars.add_argument("--ip", help="IP to ping & read data",
+                         required=True)
+    args = argpars.parse_args()
     cwd = create_directories("polling")
-    p = Process(target=ping_to_file, args=(cwd,))
-    p2 = Process(target=modbus, args=(cwd,))
+    event = Event()
+    p = Process(target=ping_to_file, args=(cwd, event, args.ip))
+    p2 = Process(target=modbus, args=(cwd, event, args.ip))
+    p3 = Process(target=finisher, args=(event,))
     p.start()
     p2.start()
+    p3.start()
     p.join()
     p2.join()
-    print("All preocesses ended")
+    p3.join()
+    print("All processes ended")
 
 
 if __name__ == '__main__':
