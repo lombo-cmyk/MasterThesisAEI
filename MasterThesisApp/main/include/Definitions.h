@@ -29,9 +29,10 @@ enum regIndex {
     indexCo,
     indexCo2,
     indexTemperature,
-    indexHumidity,
+    indexHumidityDHT,
     indexPressure,
-    indexCo_mVolts
+    indexCo_mVolts,
+    indexTemperatureDHT
 };
 
 #define ESP_DEVICE_BUSY 0x111

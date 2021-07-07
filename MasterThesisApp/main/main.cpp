@@ -67,7 +67,8 @@ void app_main(void) {
         pressureSensor.PerformReadOut();
         pressureSensor.EnableOneMeasure();
         if (dht.ReadDHT()==0){
-            dht.UpdateModbusRegisters(indexHumidity);
+            dht.UpdateModbusRegisters(indexHumidityDHT,
+                                      indexTemperatureDHT);
         }
         Lcd.GetCurrentMeasurements(
             ps.GetPM25(),
@@ -76,7 +77,8 @@ void app_main(void) {
             Co2.GetCo2Value(),
             pressureSensor.GetTemperature(),
             dht.GetHumidity(),
-            pressureSensor.GetPressure());
+            pressureSensor.GetPressure(),
+            dht.GetTemperature());
         Lcd.DisplayCurrentState();
         ps.PerformReadout();
         Co2.PerformReadout();
@@ -95,8 +97,8 @@ void app_main(void) {
                  "::::Measured CO level VOLTAGE:::: %d",
                  average);
         std::uint16_t co_ppm = 0;
-        if(CO >= 1225){
-            co_ppm = round((CO - 1225) / 0.00201);
+        if(CO >= 800){
+            co_ppm = round((CO - 800) / 0.0023);
         }
         UpdateModbusRegistersCO(static_cast<float>(co_ppm),
                                 static_cast<float>(CO));

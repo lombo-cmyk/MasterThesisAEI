@@ -35,7 +35,7 @@ def get_decoders(modbus_data: list, index: int):
 
 def create_modbus_output_file(cwd: str):
     column_names = ["time", "PM2.5", "PM10", "CO", "CO2", "temperature",
-                    "humidity", "pressure"]
+                    "humidity", "pressure", "CO_mVolts", "temp_DHT"]
     with open(f"{cwd}/modbus.csv", 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(column_names)
@@ -53,12 +53,12 @@ def modbus(cwd: str, event: Event, ip: str):
         res = None
         if is_connected:
             try:
-                res = client.read_holding_registers(0, 14, unit=slave_address)
+                res = client.read_holding_registers(0, 18, unit=slave_address)
             except ConnectionException:
                 print("Connection failed")
             if res:
                 decoders = [get_decoders(res.registers, i) for i in
-                            range(0, 7)]
+                            range(0, 9)]
                 values = [decoder.decode_32bit_float() for decoder in decoders]
                 now = datetime.now()
                 current_time = now.strftime("%H:%M:%S")
