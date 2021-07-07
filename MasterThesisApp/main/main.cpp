@@ -14,9 +14,16 @@
 #include "esp_log.h"
 #include "esp_adc_cal.h"
 #include "AdcWrapper.h"
-
+#include <cmath>
 extern "C" {
 void app_main();
+}
+
+void UpdateModbusRegistersCO(float Co, float Co_mVolts) {
+    auto& modbusManager = Modbus::getInstance();
+    std::array<std::uint8_t, 2> indexes{indexCo, indexCo_mVolts};
+    std::array<float, 2> values{Co, Co_mVolts};
+    modbusManager.UpdateHoldingRegs(indexes, values);
 }
 
 void app_main(void) {
@@ -87,7 +94,12 @@ void app_main(void) {
         ESP_LOGI(deviceCoSens,
                  "::::Measured CO level VOLTAGE:::: %d",
                  average);
-
+        std::uint16_t co_ppm = 0;
+        if(CO >= 1225){
+            co_ppm = round((CO - 1225) / 0.00201);
+        }
+        UpdateModbusRegistersCO(static_cast<float>(co_ppm),
+                                static_cast<float>(CO));
         ethManager.executeEthernetStatusGuard();
         vTaskDelay(SECOND);
     }

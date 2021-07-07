@@ -150,8 +150,15 @@ void LCD::DisplayPM10() {
 }
 
 void LCD::DisplayCO() {
+    CO_ -= 20; // esp is measirng 20mV too much
+    CO_ /= 1000; // convert to volts
     std::string firstLine = "CO";
     std::string secondLine = ConvertNumberToString(CO_, 2);
+    std::uint16_t co_ppm = 0;
+    if(CO_ >= 1.225){
+        co_ppm = round((CO_ - 1.225) / 0.00201);
+    }
+    secondLine += "V, " + std::to_string(co_ppm) + "ppm";
     DisplayTwoLines(firstLine, secondLine);
 }
 
