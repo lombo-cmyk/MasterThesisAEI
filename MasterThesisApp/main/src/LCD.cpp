@@ -30,8 +30,7 @@ void LCD::GetCurrentMeasurements(std::uint16_t pm25,
                                  std::uint16_t co2,
                                  double t,
                                  float h,
-                                 unsigned int p,
-                                 double t_dht) {
+                                 unsigned int p) {
     PM25_=pm25;
     PM10_=pm10;
     CO_=co;
@@ -39,7 +38,6 @@ void LCD::GetCurrentMeasurements(std::uint16_t pm25,
     temperature_=t;
     humidity_=h;
     pressure_=p;
-    temperature_DHT_ = t_dht;
 }
 void LCD::AdjustLine(std::string& line) {
     std::string buf;
@@ -157,8 +155,9 @@ void LCD::DisplayCO() {
     std::string firstLine = "CO";
     std::string secondLine = ConvertNumberToString(CO_, 2);
     std::uint16_t co_ppm = 0;
-    if(CO_ >= 0.8){
-        co_ppm = round((CO_ - 0.8) / 0.0023);
+    //TODO: move calculations somewhere
+    if(CO_ >= 1.15){
+        co_ppm = round((CO_ - 1.15) / 0.00206);
     }
     secondLine += "V, " + std::to_string(co_ppm) + "ppm";
     DisplayTwoLines(firstLine, secondLine);
@@ -171,10 +170,8 @@ void LCD::DisplayCO2() {
 }
 
 void LCD::DisplayTemperature() {
-    std::string firstLine = "Press Temp DHT";
+    std::string firstLine = "Temp LPS331AP";
     std::string secondLine = ConvertNumberToString(temperature_, 1);
-    std::string t_dht = ConvertNumberToString(temperature_DHT_, 1);
-    secondLine += ",    " + t_dht;
     DisplayTwoLines(firstLine, secondLine);
 }
 void LCD::DisplayHumidity() {

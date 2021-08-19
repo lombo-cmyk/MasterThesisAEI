@@ -22,15 +22,14 @@ public:
                                 std::uint16_t co2,
                                 double t,
                                 float h,
-                                unsigned int p,
-                                double t_dht);
+                                unsigned int p);
 
 private:
     i2c_lcd1602_info_t* LcdInfo_ = new i2c_lcd1602_info_t;
     bool isBacklight_ = true;
     std::uint64_t backlightTimer_ = esp_timer_get_time();
     InterruptHandler& intHandler_ = InterruptHandler::getInstance();
-    double CO_ = 0, temperature_ = 0, temperature_DHT_ = 0;
+    double CO_ = 0, temperature_ = 0;
     float humidity_ = 0;
     std::uint16_t PM25_ = 0, PM10_ = 0, CO2_ = 0;
     unsigned int pressure_ = 0;

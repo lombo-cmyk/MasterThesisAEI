@@ -18,13 +18,18 @@ for index, elem in enumerate(x):
             date_offset = datetime.timedelta(days=1)
     dupa.append(elem + date_offset)
 
-for column in columns[1:]:
+y_label = ["PM2.5 Concentration [ppm]", "", "", "Carbon dioxide [ppm]",
+           "Temperature[°C]", "Relative humidity", ""]
+for column, y in zip(columns[1:], y_label):
     fig, ax = plt.subplots()
-    ax.plot(dupa, file[column])
+    ax.scatter(dupa, file[column], marker='x', s=1, c='black')
     plt.gcf().autofmt_xdate()
 
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 
-    plt.title(f"Values for: {column}")
+    # plt.title(f"Values for: {column}")
+    plt.xlabel("Time [HH:MM]", fontsize=20)
+    plt.ylabel(y, fontsize=20)
+    plt.grid()
     fig.savefig(cwd + column + ".png")
     plt.close()

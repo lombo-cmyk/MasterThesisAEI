@@ -19,15 +19,23 @@ extern "C" {
 void app_main();
 }
 
-void UpdateModbusRegistersCO(float Co, float Co_mVolts) {
+void UpdateModbusRegistersCO(float Co_mVolts) {
+    // TODO: move to other file
     auto& modbusManager = Modbus::getInstance();
-    std::array<std::uint8_t, 2> indexes{indexCo, indexCo_mVolts};
-    std::array<float, 2> values{Co, Co_mVolts};
-    modbusManager.UpdateHoldingRegs(indexes, values);
+    Co_mVolts-=20;
+    float co_ppm = 1;
+    if(Co_mVolts >= 1150){
+        auto Co_volts = Co_mVolts/1000;
+        co_ppm = round((Co_volts - 1.15) / 0.00206);
+    }
+
+    std::array<std::uint8_t, 2> index{indexCo_mVolts, indexCo_ppm};
+    std::array<float, 2> value{Co_mVolts, co_ppm}; // this esp measures 20mV too much
+    modbusManager.UpdateHoldingRegs(index, value);
 }
 
 void app_main(void) {
-    double CO = 0;
+    float CO = 0;
     esp_log_level_set("*", ESP_LOG_INFO);
     auto adc_chars = new esp_adc_cal_characteristics_t;
     ConfigureADC(adc_chars);
@@ -77,8 +85,7 @@ void app_main(void) {
             Co2.GetCo2Value(),
             pressureSensor.GetTemperature(),
             dht.GetHumidity(),
-            pressureSensor.GetPressure(),
-            dht.GetTemperature());
+            pressureSensor.GetPressure());
         Lcd.DisplayCurrentState();
         ps.PerformReadout();
         Co2.PerformReadout();
@@ -96,12 +103,7 @@ void app_main(void) {
         ESP_LOGI(deviceCoSens,
                  "::::Measured CO level VOLTAGE:::: %d",
                  average);
-        std::uint16_t co_ppm = 0;
-        if(CO >= 800){
-            co_ppm = round((CO - 800) / 0.0023);
-        }
-        UpdateModbusRegistersCO(static_cast<float>(co_ppm),
-                                static_cast<float>(CO));
+        UpdateModbusRegistersCO(static_cast<float>(CO));
         ethManager.executeEthernetStatusGuard();
         vTaskDelay(SECOND);
     }
