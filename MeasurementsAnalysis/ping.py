@@ -1,15 +1,15 @@
 import csv
-from pythonping import ping
+from argparse import ArgumentParser
 from datetime import datetime
-from multiprocessing import Process
+from msvcrt import kbhit as windows_key_press
+from multiprocessing import Event, Process
 from pymodbus.constants import Endian
 from pymodbus.client.sync import ModbusTcpClient
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.exceptions import ConnectionException
-from msvcrt import kbhit as windows_key_press
-from VoltageAnalyzer import create_directories
-from multiprocessing import Event
-from argparse import ArgumentParser
+from pythonping import ping
+
+from free_functions import create_directories
 
 
 def ping_to_file(cwd: str, event: Event, ip: str):

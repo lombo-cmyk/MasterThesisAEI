@@ -1,4 +1,5 @@
-from VoltageAnalyzer import VoltageAnalyzer, create_directories
+from RawVoltageAnalysis.VoltageAnalyzer import VoltageAnalyzer
+from free_functions import create_directories
 from argparse import ArgumentParser
 
 parser = ArgumentParser()
