@@ -9,7 +9,7 @@ from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.exceptions import ConnectionException
 from pythonping import ping
 
-from free_functions import create_directories
+from common import create_directories, COLUMN_NAMES
 
 
 def ping_to_file(cwd: str, event: Event, ip: str):
@@ -34,11 +34,9 @@ def get_decoders(modbus_data: list, index: int):
 
 
 def create_modbus_output_file(cwd: str):
-    column_names = ["time", "PM2.5", "PM10", "CO", "CO2", "temperature",
-                    "humidity", "pressure", "CO_mVolts", "temp_DHT"]
     with open(f"{cwd}/modbus.csv", 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(column_names)
+        writer.writerow(COLUMN_NAMES.values())
 
 
 def modbus(cwd: str, event: Event, ip: str):

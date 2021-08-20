@@ -41,8 +41,7 @@ LICENSE
 *.app
 
 # Output plots
-MeasurementsAnalysis/temp_plots/
-MeasurementsAnalysis/polling/
-MeasurementsAnalysis/__pycache__/
+MeasurementsAnalysis/results/
+__pycache__/
 
 

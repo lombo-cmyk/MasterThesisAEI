@@ -3,14 +3,14 @@ import pandas as pd
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-from free_functions import create_directories
+from common import create_directories, Columns, COLUMN_NAMES
 
-file = pd.read_csv("polling/2021_05_11_22_17_32/modbus.csv", sep=",")
-columns = file.columns
+file = pd.read_csv("results/polling/2021_05_11_22_17_32/dupa.csv", sep=",")
 cwd = create_directories("temp_plots")
 
 
-x = [datetime.datetime.strptime(elem, '%H:%M:%S') for elem in file['time']]
+x = [datetime.datetime.strptime(elem, '%H:%M:%S')
+     for elem in file[COLUMN_NAMES.get(Columns.TIME)]]
 dupa = list()
 date_offset = datetime.timedelta(days=0)
 for index, elem in enumerate(x):
@@ -21,7 +21,9 @@ for index, elem in enumerate(x):
 
 y_label = ["PM2.5 Concentration [ppm]", "", "", "Carbon dioxide [ppm]",
            "Temperature[°C]", "Relative humidity", ""]
-for column, y in zip(columns[1:], y_label):
+param_colums = list(COLUMN_NAMES.values())
+param_colums.remove(COLUMN_NAMES.get(Columns.TIME))
+for column, y in zip(param_colums, y_label):
     fig, ax = plt.subplots()
     ax.scatter(dupa, file[column], marker='x', s=1, c='black')
     plt.gcf().autofmt_xdate()

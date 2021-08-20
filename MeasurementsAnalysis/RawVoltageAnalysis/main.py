@@ -1,6 +1,7 @@
-from RawVoltageAnalysis.VoltageAnalyzer import VoltageAnalyzer
-from free_functions import create_directories
 from argparse import ArgumentParser
+
+from common import create_directories
+from RawVoltageAnalysis import VoltageAnalyzer
 
 parser = ArgumentParser()
 parser.add_argument("--file", help="Path to parsed file", required=True)
