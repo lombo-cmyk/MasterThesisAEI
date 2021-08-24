@@ -5,34 +5,49 @@ import matplotlib.pyplot as plt
 
 from common import create_directories, Columns, COLUMN_NAMES
 
-file = pd.read_csv("results/polling/2021_05_11_22_17_32/dupa.csv", sep=",")
-cwd = create_directories("temp_plots")
+
+def adjust_date(time_column: pd.DataFrame):
+    date_offset = datetime.timedelta(days=1)
+    new_day_index = 0
+    time_stamp = [datetime.datetime.strptime(elem, '%H:%M:%S')
+                  for elem in time_column]
+
+    for index, elem in enumerate(time_stamp[1:], 1):
+        if elem.time() < time_stamp[index - 1].time():
+            new_day_index = index
+            break
+
+    old_day = time_stamp[:new_day_index]
+    new_day = [elem + date_offset for elem in time_stamp[new_day_index:]]
+    return old_day + new_day
 
 
-x = [datetime.datetime.strptime(elem, '%H:%M:%S')
-     for elem in file[COLUMN_NAMES.get(Columns.TIME)]]
-dupa = list()
-date_offset = datetime.timedelta(days=0)
-for index, elem in enumerate(x):
-    if index > 0:
-        if elem.time() < x[index-1].time():
-            date_offset = datetime.timedelta(days=1)
-    dupa.append(elem + date_offset)
+def main():
+    y_label_dict = {Columns.PM25: "PM2.5 Concentration [ppm]",
+                    Columns.CO2: "Carbon dioxide [ppm]",
+                    Columns.TEMPERATURE: "Temperature[°C]",
+                    Columns.HUMIDITY: "Relative humidity"}
 
-y_label = ["PM2.5 Concentration [ppm]", "", "", "Carbon dioxide [ppm]",
-           "Temperature[°C]", "Relative humidity", ""]
-param_colums = list(COLUMN_NAMES.values())
-param_colums.remove(COLUMN_NAMES.get(Columns.TIME))
-for column, y in zip(param_colums, y_label):
-    fig, ax = plt.subplots()
-    ax.scatter(dupa, file[column], marker='x', s=1, c='black')
-    plt.gcf().autofmt_xdate()
+    file = pd.read_csv("measurements/24h_run.csv", sep=",")
+    cwd = create_directories("temp_plots")
 
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    time_of_day = adjust_date(time_column=file[COLUMN_NAMES.get(Columns.TIME)])
 
-    # plt.title(f"Values for: {column}")
-    plt.xlabel("Time [HH:MM]", fontsize=20)
-    plt.ylabel(y, fontsize=20)
-    plt.grid()
-    fig.savefig(cwd + column + ".png")
-    plt.close()
+    for key, y_label in y_label_dict.items():
+        col_name = COLUMN_NAMES.get(key)
+        fig, ax = plt.subplots()
+        ax.scatter(time_of_day, file[col_name], marker='x', s=1, c='black')
+        plt.gcf().autofmt_xdate()
+
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+
+        plt.title(f"Values for {col_name}")
+        plt.xlabel("Time [HH:MM]", fontsize=20)
+        plt.ylabel(y_label, fontsize=20)
+        plt.grid()
+        fig.savefig(cwd + col_name + ".png")
+        plt.close()
+
+
+if __name__ == '__main__':
+    main()
