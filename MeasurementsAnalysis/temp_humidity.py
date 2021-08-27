@@ -1,13 +1,11 @@
-import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
-from common.free_functions import create_directories
 import matplotlib.dates as mdates
+import pandas as pd
 
-from common import Columns, COLUMN_NAMES
+from common import Columns, COLUMN_NAMES, create_directories
+
 cwd = create_directories("temp_plots")
-
-data = pd.read_csv("measurements/long_run.csv", sep=",")
 
 TEMP_COL = COLUMN_NAMES.get(Columns.TEMPERATURE)
 TEMP_DHT_COL = COLUMN_NAMES.get(Columns.TEMP_DHT)
@@ -45,7 +43,7 @@ def calculate_errors(mean_dict: dict,
     return error_dict
 
 
-def create_latex_measurement_error_table(data__: pd.DataFrame) -> pd.DataFrame:
+def create_latex_measurement_error_table(data__: pd.DataFrame) -> None:
     line_ending = r"\\ \hline"
     print("temp_set  | abs_erorr_lp | rel_erorr_lp | "
           "abs_erorr_dht_temp | rel_erorr_dht_temp | "
@@ -64,50 +62,80 @@ def create_latex_measurement_error_table(data__: pd.DataFrame) -> pd.DataFrame:
         print(line_ending)
 
 
-create_latex_measurement_error_table(data)
-
-# *****************************************************************
-# ********* File is partially refactored up to this point *********
-# *****************************************************************
-
-dht_temp_offset = 1.20
-dht_temp_scale = TEMP_REF_VAL[-1] / (data[TEMP_DHT_COL][FILE_INDEXES[-1]] -
-                                     dht_temp_offset)
-
-timestamps = [datetime.datetime.strptime(elem, '%H:%M:%S') for elem in data['time']]
-
-date_offset = datetime.timedelta(hours=timestamps[0].hour)
-
-timestamps = [d - date_offset for d in timestamps]
-fig, ax = plt.subplots()
-ax.plot(timestamps[0:1695 + 10], (data[TEMP_DHT_COL][0:1695 + 10]), label="Raw "
-                                                            "measurements", c='b')
-dht_temperature_corrected = (data[TEMP_DHT_COL][0:1695 + 10] -
-                             dht_temp_offset) * dht_temp_scale
-ax.plot(timestamps[0:1695 + 10], dht_temperature_corrected,
-        label="Corrected measurements", c='g')
-time_scatter = [timestamps[index] for index in FILE_INDEXES]
-ax.scatter(time_scatter, TEMP_REF_VAL, marker='x', s=60, c='r',
-           label="Reference values")
-
-plt.gcf().autofmt_xdate()
-
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+def get_dht_temp_offset(data: pd.DataFrame) -> float:
+    min_ref_index = TEMP_REF_VAL.index(min(TEMP_REF_VAL))
+    data_ref_index = FILE_INDEXES[min_ref_index]
+    offset = data[TEMP_DHT_COL][data_ref_index] - TEMP_REF_VAL[min_ref_index]
+    return round(offset, 2)
 
 
-plt.xlabel("Time [HH:MM]", fontsize=20)
-plt.ylabel("Temperature [°C]", fontsize=20)
-plt.grid()
-plt.legend()
-fig.savefig(f"{cwd}co2_values.png", dpi=300)
+def get_timestamps(data: pd.DataFrame) -> list:
+    timestamps = [datetime.datetime.strptime(elem, '%H:%M:%S') for elem in
+                  data['time']]
+    date_offset = datetime.timedelta(hours=timestamps[0].hour)
+    timestamps = [d - date_offset for d in timestamps]
+    return timestamps
 
 
-line_ending = r"\\ \hline"
-print(30 * "# ")
-for index, temp_set, temp_ref in zip(FILE_INDEXES, TEMP_SET_POINTS, TEMP_REF_VAL):
-    measured_temp_dht = dht_temperature_corrected[index]
-    abs_erorr_dht_t = abs(measured_temp_dht - temp_ref)
-    rel_erorr_dht_t = abs_erorr_dht_t / temp_ref * 100
+def correct_dht_measurements(data: pd.DataFrame) -> pd.Series:
+    dht_temp_offset = get_dht_temp_offset(data)
+    dht_temp_scale = TEMP_REF_VAL[-1] / (data[TEMP_DHT_COL][FILE_INDEXES[-1]] -
+                                         dht_temp_offset)
+    dht_temperature_corrected = (data[TEMP_DHT_COL][:max(FILE_INDEXES) + 10] -
+                                 dht_temp_offset) * dht_temp_scale
+    return dht_temperature_corrected
 
-    print(f"{temp_set} & {abs_erorr_dht_t:.2f} & {rel_erorr_dht_t:.2f}   " +
-          line_ending)
+
+def plot_dht_measurements(data: pd.DataFrame,
+                          corrected_temp: pd.Series) -> None:
+    fig, ax = plt.subplots()
+
+    timestamps = get_timestamps(data)
+
+    ax.plot(timestamps[:max(FILE_INDEXES) + 10],
+            data[TEMP_DHT_COL][:max(FILE_INDEXES) + 10],
+            label="Raw measurements", c='b')
+
+    ax.plot(timestamps[:max(FILE_INDEXES) + 10],
+            corrected_temp,
+            label="Corrected measurements", c='g')
+
+    time_scatter = [timestamps[index] for index in FILE_INDEXES]
+    ax.scatter(time_scatter, TEMP_REF_VAL, marker='x', s=60, c='r',
+               label="Reference values")
+
+    plt.gcf().autofmt_xdate()
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    plt.xlabel("Time [HH:MM]", fontsize=20)
+    plt.ylabel("Temperature [°C]", fontsize=20)
+    plt.grid()
+    plt.legend()
+    fig.savefig(f"{cwd}dht_temp.png", dpi=300)
+
+
+def create_latex_corrected_dht_table(temp_corrected: pd.Series):
+    line_ending = r"\\ \hline"
+    for index, temp_set, temp_ref in zip(FILE_INDEXES, TEMP_SET_POINTS,
+                                         TEMP_REF_VAL):
+        measured_temp_dht = temp_corrected[index]
+        abs_erorr_dht_t = abs(measured_temp_dht - temp_ref)
+        rel_erorr_dht_t = abs_erorr_dht_t / temp_ref * 100
+
+        print(f"{temp_set} & "
+              f"{abs_erorr_dht_t:.2f} & "
+              f"{rel_erorr_dht_t:.2f}   " +
+              line_ending)
+
+
+def main():
+    data = pd.read_csv("measurements/long_run.csv", sep=",")
+
+    create_latex_measurement_error_table(data)
+    print(30 * "# ")
+    dht_corrected_temperature = correct_dht_measurements(data)
+    plot_dht_measurements(data, dht_corrected_temperature)
+    create_latex_corrected_dht_table(dht_corrected_temperature)
+
+
+if __name__ == '__main__':
+    main()
