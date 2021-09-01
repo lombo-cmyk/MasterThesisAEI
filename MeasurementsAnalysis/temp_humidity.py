@@ -1,3 +1,5 @@
+# TODO: extract latex table generator to something universal
+
 import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -45,9 +47,13 @@ def calculate_errors(mean_dict: dict,
 
 def create_latex_measurement_error_table(data__: pd.DataFrame) -> None:
     line_ending = r"\\ \hline"
-    print("temp_set  | abs_erorr_lp | rel_erorr_lp | "
-          "abs_erorr_dht_temp | rel_erorr_dht_temp | "
-          "abs_error_dht_hum | rel_erorr_dht_hum")
+    columns = ["temp_set", "abs_erorr_lp", "rel_erorr_lp",
+               "abs_erorr_dht_temp", "rel_erorr_dht_temp",
+               "abs_error_dht_hum", "rel_erorr_dht_hum"]
+    longest_word = len(max(columns, key=len))
+    row_format = ("{:>%s}" % str(longest_word + 1)) * (len(columns))
+    cell_format = "{:>%s}" % str(longest_word + 1)
+    print(row_format.format(*columns))
     for index, temp_set, temp_ref, hum_ref in zip(FILE_INDEXES,
                                                   TEMP_SET_POINTS,
                                                   TEMP_REF_VAL,
@@ -55,10 +61,11 @@ def create_latex_measurement_error_table(data__: pd.DataFrame) -> None:
         mean_dict = calc_mean_and_std_values(data__, index)
         error_dict = calculate_errors(mean_dict, temp_ref, hum_ref)
 
-        print(f"{temp_set} ", end='')
+        print(cell_format.format(temp_set), end='')
         for col in [TEMP_COL, TEMP_DHT_COL, HUM_DHT_COL]:
             value = error_dict.get(col)
-            print(f"& {value[0]:.2f} & {value[1]:.2f} ", end='')
+            print(cell_format.format(f"& {value[0]:.2f}"), end='')
+            print(cell_format.format(f"& {value[1]:.2f} "), end='')
         print(line_ending)
 
 
@@ -114,17 +121,18 @@ def plot_dht_measurements(data: pd.DataFrame,
 
 
 def create_latex_corrected_dht_table(temp_corrected: pd.Series):
-    line_ending = r"\\ \hline"
+    line_ending = r" \\ \hline"
+    columns = ["temp_set", "absolute error", "relative error"]
+    longest_word = len(max(columns, key=len))
+    row_format = ("{:>%s}" % str(longest_word + 1)) * (len(columns))
+    print(row_format.format(*columns))
     for index, temp_set, temp_ref in zip(FILE_INDEXES, TEMP_SET_POINTS,
                                          TEMP_REF_VAL):
         measured_temp_dht = temp_corrected[index]
-        abs_erorr_dht_t = abs(measured_temp_dht - temp_ref)
-        rel_erorr_dht_t = abs_erorr_dht_t / temp_ref * 100
-
-        print(f"{temp_set} & "
-              f"{abs_erorr_dht_t:.2f} & "
-              f"{rel_erorr_dht_t:.2f}   " +
-              line_ending)
+        abs_erorr_dht_t = round(abs(measured_temp_dht - temp_ref), 2)
+        rel_erorr_dht_t = round(abs_erorr_dht_t / temp_ref * 100, 2)
+        print(row_format.format(temp_set, "& " + str(abs_erorr_dht_t),
+                                "& " + str(rel_erorr_dht_t)) + line_ending)
 
 
 def main():
