@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import pandas as pd
 
+from collections import OrderedDict
+
 from common import Columns, COLUMN_NAMES, create_directories
 
 cwd = create_directories("temp_plots")
@@ -122,17 +124,23 @@ def plot_dht_measurements(data: pd.DataFrame,
 
 def create_latex_corrected_dht_table(temp_corrected: pd.Series):
     line_ending = r" \\ \hline"
-    columns = ["temp_set", "absolute error", "relative error"]
-    longest_word = len(max(columns, key=len))
-    row_format = ("{:>%s}" % str(longest_word + 1)) * (len(columns))
-    print(row_format.format(*columns))
+    table = OrderedDict([("temp_set", None),
+                         ("absolute error", None),
+                         ("relative error", None)])
+
+    longest_word = len(max(table, key=len))
+    space_size = str(longest_word + 1)
+    row_format = (" {:>%s} &" % space_size * (len(table) - 1) +
+                  " {:>%s} " % space_size)
+    print(row_format.format(*table.keys()))
     for index, temp_set, temp_ref in zip(FILE_INDEXES, TEMP_SET_POINTS,
                                          TEMP_REF_VAL):
-        measured_temp_dht = temp_corrected[index]
-        abs_erorr_dht_t = round(abs(measured_temp_dht - temp_ref), 2)
-        rel_erorr_dht_t = round(abs_erorr_dht_t / temp_ref * 100, 2)
-        print(row_format.format(temp_set, "& " + str(abs_erorr_dht_t),
-                                "& " + str(rel_erorr_dht_t)) + line_ending)
+        table["temp_set"] = temp_set
+        table["absolute error"] = round(abs(temp_corrected[index] - temp_ref),
+                                        2)
+        table["relative error"] = round(table["absolute error"] /
+                                        temp_ref * 100, 2)
+        print(row_format.format(*table.values()) + line_ending)
 
 
 def main():
