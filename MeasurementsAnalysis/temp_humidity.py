@@ -35,7 +35,7 @@ def calc_mean_and_std_values(data__: pd.DataFrame, index: int) -> dict:
 def calculate_errors(mean_dict: dict,
                      temp_ref: float,
                      hum_ref: float) -> dict:
-    error_dict = {}
+    error_dict = OrderedDict()
     iter_list = [(TEMP_COL, temp_ref),
                  (TEMP_DHT_COL, temp_ref),
                  (HUM_DHT_COL, hum_ref)]
@@ -43,19 +43,25 @@ def calculate_errors(mean_dict: dict,
     for col, ref_value in iter_list:
         abs_error = abs(mean_dict[col] - ref_value)
         rel_error = abs_error/ref_value * 100
-        error_dict[col] = (abs_error, rel_error)
+        error_dict[col + "_abs_err"] = abs_error
+        error_dict[col + "_rel_err"] = rel_error
     return error_dict
 
 
 def create_latex_measurement_error_table(data__: pd.DataFrame) -> None:
     line_ending = r"\\ \hline"
-    columns = ["temp_set", "abs_erorr_lp", "rel_erorr_lp",
-               "abs_erorr_dht_temp", "rel_erorr_dht_temp",
-               "abs_error_dht_hum", "rel_erorr_dht_hum"]
-    longest_word = len(max(columns, key=len))
-    row_format = ("{:>%s}" % str(longest_word + 1)) * (len(columns))
-    cell_format = "{:>%s}" % str(longest_word + 1)
-    print(row_format.format(*columns))
+    table = OrderedDict([("temp_set", None),
+                         (TEMP_COL + "_abs_err", None),
+                         (TEMP_COL + "_rel_err", None),
+                         (TEMP_DHT_COL + "_abs_err", None),
+                         (TEMP_DHT_COL + "_rel_err", None),
+                         (HUM_DHT_COL + "_abs_err", None),
+                         (HUM_DHT_COL + "_rel_err", None)])
+    longest_word = len(max(table.keys(), key=len))
+    space_size = str(longest_word + 1)
+    row_format = " {:>%s} &" % space_size * (len(table) - 1) + \
+                 " {:>%s} " % space_size
+    print(row_format.format(*table.keys()))
     for index, temp_set, temp_ref, hum_ref in zip(FILE_INDEXES,
                                                   TEMP_SET_POINTS,
                                                   TEMP_REF_VAL,
@@ -63,11 +69,10 @@ def create_latex_measurement_error_table(data__: pd.DataFrame) -> None:
         mean_dict = calc_mean_and_std_values(data__, index)
         error_dict = calculate_errors(mean_dict, temp_ref, hum_ref)
 
-        print(cell_format.format(temp_set), end='')
-        for col in [TEMP_COL, TEMP_DHT_COL, HUM_DHT_COL]:
-            value = error_dict.get(col)
-            print(cell_format.format(f"& {value[0]:.2f}"), end='')
-            print(cell_format.format(f"& {value[1]:.2f} "), end='')
+        table["temp_set"] = temp_set
+        for key, val in error_dict.items():
+            table[key] = round(val, 2)
+        print(row_format.format(*table.values()), end='')
         print(line_ending)
 
 
@@ -128,7 +133,7 @@ def create_latex_corrected_dht_table(temp_corrected: pd.Series):
                          ("absolute error", None),
                          ("relative error", None)])
 
-    longest_word = len(max(table, key=len))
+    longest_word = len(max(table.keys(), key=len))
     space_size = str(longest_word + 1)
     row_format = (" {:>%s} &" % space_size * (len(table) - 1) +
                   " {:>%s} " % space_size)
